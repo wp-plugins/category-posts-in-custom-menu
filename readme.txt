@@ -2,6 +2,7 @@
 Tags: menu, category, posts
 Requires at least: 3.2.1
 Tested up to: 3.2.1
+Stable tag: 0.1
 
 This plugin replaces all Category-links in a Custom Menu by a list of the posts in that category. Just activate the plugin and it replaces all category-links in your menu by the posts in that category.
 
