@@ -1,12 +1,15 @@
 === Category Posts in Custom Menu ===
+Contributors: anaid
 Tags: menu, category, posts
 Requires at least: 3.2.1
 Tested up to: 3.2.1
 Stable tag: 0.1
 
-This plugin replaces all Category-links in a Custom Menu by a list of the posts in that category. Just activate the plugin and it replaces all category-links in your menu by the posts in that category.
+Replaces all category-links in a custom menu by a list of links to posts in that category, sorted ascending by title.
 
-= Description ==
+== Description ==
+
+The custom menu only allows adding a link to a category page. I wanted to inserts all posts from a certain category into the menu, so I wrote a little plug-in. Just activate the plugin. No configuration.
 
 This plugin uses the wp_nav_menu_objects filter hook to remove and replace category items in the menu by the posts in that category. It's my first plugin and first-time use of PHP, please be nice :)
 
