@@ -19,6 +19,10 @@ This plugin uses the wp_nav_menu_objects filter hook to remove and replace categ
 
 It's my first plugin and first-time use of PHP, please be nice :)
 
+== Screenshots ==
+
+1. Go to Appearance > Menu to enable/disable and set the options for the replacement of Category / Post Tag links by their posts.
+
 == Changelog ==
 
 0.2
