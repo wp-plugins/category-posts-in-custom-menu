@@ -26,9 +26,11 @@ It's my first plugin and first-time use of PHP, please be nice :)
 == Changelog ==
 
 0.2
+
 * Extended the plugin to post tags. Note that the plugin name has unfortunately _not_ been changed to reflect this extension. 
 
 Added checkboxes, dropdowns and text fields to Appearance > Menu. It is now possible to:
+
 * Enable/disable per taxonomy item whether you want to replace it by its posts
 * Specify the (maximum) number of posts that should be displayed.
 * Specify the ordering (Descending/Ascending) and the field to order by (ID, title, etc..)
