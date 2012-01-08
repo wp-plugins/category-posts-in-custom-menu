@@ -43,4 +43,10 @@ Added checkboxes, dropdowns and text fields to Appearance > Menu. It is now poss
 
 == Frequently Asked Questions ==
 
-None yet.
+* I see no difference in Appearance > Menus
+
+If you check a category from 'Categories' on the left and click 'Add to Menu', the newly added block (right) should have some extra options, as shown in the plugin screenshots (http://wordpress.org/extend/plugins/category-posts-in-custom-menu/screenshots/). There are two reasons why you might not see a difference.
+
+1. One possible reason why you see no differences in Appearance > Menus would be if you have another plugin that works on Appearance > Menus and has a higher priority than mine. The reason for this is purely technical, it is because WordPress currently has no 'hooks' in one specific class so I have to override that class. If another plugin has overridden that class as well and with a higher priority, then mine won't show any differences in Appearance > Menus.
+
+2. Another reason, the most likely one, is that you are experiencing issue 14527 (http://core.trac.wordpress.org/ticket/14527). When adding a menu item but before saving it, you will indeed see none of the promised checkboxes. This is because the hook that is used to extend the functionality is not being applied until you've saved the item. Unfortunately, until a patch is approved, there's not much I can do. Make sure you save your menu, then you should see the extended functionality for the saved menu items.
