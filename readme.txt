@@ -25,6 +25,10 @@ It's my first plugin and first-time use of PHP, please be nice :)
 
 == Changelog ==
 
+0.3
+
+* Extended the plugin for use of custom fields. Use a custom field with name 'my field' with wildcard %post_my_field. Note that if the post does not have this custom field, the wildcard is removed (it is not replaced by anything).
+
 0.2
 
 * Extended the plugin to post tags. Note that the plugin name has unfortunately _not_ been changed to reflect this extension. 
