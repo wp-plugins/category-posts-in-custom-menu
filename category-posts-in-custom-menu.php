@@ -1,28 +1,28 @@
 <?php
 /*
-        Plugin Name: Category Posts in Custom Menu
-        Plugin URI: http://diana.imyou.nl/category-posts-in-custom-menu
-        Description: This plugin replaces selected Category links / Post Tag links in a Custom Menu by a list of their posts.
-        Version: 0.2
-        Author: Diana Koenraadt
-        Author URI: http://diana.imyou.nl
-        License: GPL2
+    Plugin Name: Category Posts in Custom Menu
+    Plugin URI: http://diana.imyou.nl/category-posts-in-custom-menu
+    Description: This plugin replaces selected Category links / Post Tag links in a Custom Menu by a list of their posts.
+    Version: 0.3
+    Author: Diana Koenraadt
+    Author URI: http://diana.imyou.nl
+    License: GPL2
 */
 
-/*  Copyright 2011 Diana Koenraadt (email : info@imyou.nl)
+/*  Copyright 2011 Diana Koenraadt (email : diana@imyou.nl)
 
-        This program is free software; you can redistribute it and/or modify
-        it under the terms of the GNU General Public License, version 2, as 
-        published by the Free Software Foundation.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License, version 2, as 
+    published by the Free Software Foundation.
 
-        This program is distributed in the hope that it will be useful,
-        but WITHOUT ANY WARRANTY; without even the implied warranty of
-        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-        GNU General Public License for more details.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-        You should have received a copy of the GNU General Public License
-        along with this program; if not, write to the Free Software
-        Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 require_once( ABSPATH . 'wp-admin/includes/nav-menu.php' ); // Load all the nav menu interface functions
@@ -40,33 +40,33 @@ class CPCM_Manager {
 	function __construct()
 	{
 		add_action( 'admin_enqueue_scripts', array( &$this, 'cpmp_wp_admin_nav_menus_css' ) );
-                add_filter( 'wp_edit_nav_menu_walker', array( &$this, 'cpcm_edit_nav_menu_walker' ), 1, 2 );
-                add_filter( 'wp_nav_menu_objects', array( &$this, 'cpcm_replace_taxonomy_by_posts' ), 1, 2 );
-                add_action( 'wp_update_nav_menu_item', array( &$this, 'cpcm_update_nav_menu_item' ), 1, 3 );  
+        add_filter( 'wp_edit_nav_menu_walker', array( &$this, 'cpcm_edit_nav_menu_walker' ), 1, 2 );
+        add_filter( 'wp_nav_menu_objects', array( &$this, 'cpcm_replace_taxonomy_by_posts' ), 1, 2 );
+        add_action( 'wp_update_nav_menu_item', array( &$this, 'cpcm_update_nav_menu_item' ), 1, 3 );  
 	} // function
 
         static function cpmp_uninstall() {
-                // We're uninstalling, so delete all custom fields on nav_menu_items that the CPCM plugin added
-                $all_nav_menu_items = get_posts('numberposts=-1&post_type=nav_menu_item&post_status=any');
+            // We're uninstalling, so delete all custom fields on nav_menu_items that the CPCM plugin added
+            $all_nav_menu_items = get_posts('numberposts=-1&post_type=nav_menu_item&post_status=any');
 
-                foreach( $all_nav_menu_items as $nav_menu_item) {
-                        delete_post_meta($nav_menu_item->ID, 'cpcm-unfold');
-                        delete_post_meta($nav_menu_item->ID, 'cpcm-orderby');
-                        delete_post_meta($nav_menu_item->ID, 'cpcm-order');
-                        delete_post_meta($nav_menu_item->ID, 'cpcm-item-count');
-                        delete_post_meta($nav_menu_item->ID, 'cpcm-item-titles');
-                }
+            foreach( $all_nav_menu_items as $nav_menu_item) {
+                delete_post_meta($nav_menu_item->ID, 'cpcm-unfold');
+                delete_post_meta($nav_menu_item->ID, 'cpcm-orderby');
+                delete_post_meta($nav_menu_item->ID, 'cpcm-order');
+                delete_post_meta($nav_menu_item->ID, 'cpcm-item-count');
+                delete_post_meta($nav_menu_item->ID, 'cpcm-item-titles');
+            }
         } // function
 
         /* 
         * Add CSS for div.cpmp-description to nav-menus.php
         */
         function cpmp_wp_admin_nav_menus_css($hook){
-                // Check the hook so that the .css is only added to the .php file where we need it
-                if( 'nav-menus.php' != $hook )
-                        return;
-                wp_register_style( 'cpmp_wp_admin_nav_menus_css', plugins_url( 'cpmp_wp_admin_nav_menus.css' , __FILE__ ) );
-                wp_enqueue_style( 'cpmp_wp_admin_nav_menus_css' );
+            // Check the hook so that the .css is only added to the .php file where we need it
+            if( 'nav-menus.php' != $hook )
+                    return;
+            wp_register_style( 'cpmp_wp_admin_nav_menus_css', plugins_url( 'cpmp_wp_admin_nav_menus.css' , __FILE__ ) );
+            wp_enqueue_style( 'cpmp_wp_admin_nav_menus_css' );
         } // function
 
         /*
@@ -79,10 +79,10 @@ class CPCM_Manager {
         * much better.
         */
         function cpcm_edit_nav_menu_walker( $walker_name, $menu_id ) {
-                if ( class_exists ( 'CPCM_Walker_Nav_Menu_Edit' ) ) {
-                        return 'CPCM_Walker_Nav_Menu_Edit';
-                }
-                return 'Walker_Nav_Menu_Edit';
+            if ( class_exists ( 'CPCM_Walker_Nav_Menu_Edit' ) ) {
+                    return 'CPCM_Walker_Nav_Menu_Edit';
+            }
+            return 'Walker_Nav_Menu_Edit';
         } // function
 
         /* 
@@ -94,53 +94,66 @@ class CPCM_Manager {
 	        foreach ( (array) $sorted_menu_items as $key => $menu_item ) {
 		        // Replace category object by a list of its posts: Append posts to $result
 		        // Remove the category object itself.
-                        if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "cpcm-unfold", true) == '1')) {
+                if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "cpcm-unfold", true) == '1')) {
 			        $inc += -1;
-                                $query_arr = array();
+                    $query_arr = array();
 
-                                /* 
-                                * Map 'category' to cat id and 'post_tag' to tag id. Also does this for custom taxonomy types, 
-                                * but right now only categories and post tags are supported. 
-                                * (Note to self: custom taxonomies can have custom post types too.)
-                                */
-                                $query_arr[$menu_item->object] = $menu_item->object_id; 
+                    /* 
+                    * Map 'category' to cat id and 'post_tag' to tag id. Also does this for custom taxonomy types, 
+                    * but right now only categories and post tags are supported. 
+                    * (Note to self: custom taxonomies can have custom post types too.)
+                    */
+                    $query_arr[$menu_item->object] = $menu_item->object_id; 
 
-                                /* 
-                                * Check that the taxonomy item was in fact a category or post tag. 
-                                * Currently, only these two taxonomy types are supported.
-                                * So for any other taxonomy type, it will skip the if-then and will reach the default behavior.
-                                */
-                                if ( array_key_exists ( 'category' , $query_arr ) || array_key_exists ( 'post_tag' , $query_arr )) {
-                                        // If cpcm-unfold is true, the following custom fields exist:
-                                        $query_arr['order'] = get_post_meta($menu_item->db_id, "cpcm-order", true);
-                                        $query_arr['orderby'] = get_post_meta($menu_item->db_id, "cpcm-orderby", true);
-                                        $query_arr['numberposts'] = get_post_meta($menu_item->db_id, "cpcm-item-count", true); // default value of -1 returns all posts
+                    /* 
+                    * Check that the taxonomy item was in fact a category or post tag. 
+                    * Currently, only these two taxonomy types are supported.
+                    * So for any other taxonomy type, it will skip the if-then and will reach the default behavior.
+                    */
+                    if ( array_key_exists ( 'category' , $query_arr ) || array_key_exists ( 'post_tag' , $query_arr )) {
+                        // If cpcm-unfold is true, the following custom fields exist:
+                        $query_arr['order'] = get_post_meta($menu_item->db_id, "cpcm-order", true);
+                        $query_arr['orderby'] = get_post_meta($menu_item->db_id, "cpcm-orderby", true);
+                        $query_arr['numberposts'] = get_post_meta($menu_item->db_id, "cpcm-item-count", true); // default value of -1 returns all posts
 
-			                $posts = get_posts( $query_arr );
+                        $posts = get_posts( $query_arr );
 
-			                foreach( (array) $posts as $pkey => $post ) {
-				                // Decorate the posts with the required data for a menu-item.
-				                $posts[$pkey] = wp_setup_nav_menu_item( $posts[$pkey] );
-				                $posts[$pkey]->menu_item_parent = $menu_item->menu_item_parent; // Set to parent of category page.
+                        foreach( (array) $posts as $pkey => $post ) {
+                            // Decorate the posts with the required data for a menu-item.
+                            $posts[$pkey] = wp_setup_nav_menu_item( $posts[$pkey] );
+                            $posts[$pkey]->menu_item_parent = $menu_item->menu_item_parent; // Set to parent of category page.
 
-                                                // Set the title of the new menu item
-                                                $posts[$pkey]->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
+                            // Set the title of the new menu item
+                            $posts[$pkey]->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
 
-                                                // Replace the placeholders in the title by the properties of the post
-                                                $userdata = get_userdata($posts[$pkey]->post_author);
-					        $posts[$pkey]->title = str_replace( "%post_author", 	$userdata ? $userdata->display_name : '', 	$posts[$pkey]->title);
-					        $posts[$pkey]->title = str_replace( "%post_title", 	$posts[$pkey]->post_title, 	$posts[$pkey]->title);
+                            // Replace the placeholders in the title by the properties of the post
+                            $userdata = get_userdata($posts[$pkey]->post_author);
+                            $posts[$pkey]->title = str_replace( "%post_author", 	$userdata ? $userdata->display_name : '', 	$posts[$pkey]->title);
+                            $posts[$pkey]->title = str_replace( "%post_title", 	$posts[$pkey]->post_title, 	$posts[$pkey]->title);
+                                                        
+                            $custom_field_keys = get_post_custom_keys($posts[$pkey]->ID);
+                            foreach ( $custom_field_keys as $key => $value ) {
+                                $valuet = trim($value);
+                                if ( '_' == $valuet{0} )
+                                    continue;
+                                $meta = get_post_meta($posts[$pkey]->ID, $valuet, true);
+                                $valuet_str = str_replace(' ', '_', $valuet);
+                                $posts[$pkey]->title = str_replace( "%post_" . $valuet_str, $meta, $posts[$pkey]->title);
+                            }
+                            // Remove remaining %post_ occurrences.
+                            $pattern = "/%post_\w+/";
+                            $posts[$pkey]->title = preg_replace($pattern, '', $posts[$pkey]->title);
 
-				                $inc += 1;
-			                }
-			                // Extend the items with classes.
-			                _wp_menu_item_classes_by_context( $posts );
-			                // Append the new menu_items to the menu array that we're building.
-			                $result = array_merge( $result, $posts ); 
-
-                                        continue; // We've handled this case, don't visit the case for other objects.
-                                }
+                            $inc += 1;
                         }
+                        // Extend the items with classes.
+                        _wp_menu_item_classes_by_context( $posts );
+                        // Append the new menu_items to the menu array that we're building.
+                        $result = array_merge( $result, $posts ); 
+
+                        continue; // We've handled this case, don't visit the case for other objects.
+                    }
+                }
 
 		        // Treat other objects as usual, but note that the position 
 		        // of elements in the array changes.
@@ -155,21 +168,21 @@ class CPCM_Manager {
         * Store the entered data in nav-menus.php by inspecting the $_POST variable again.
         */
         function cpcm_update_nav_menu_item( $menu_id = 0, $menu_item_db_id = 0, $menu_item_data = array() ) {
-                // Only inspect the values if the $_POST variable contains data (the wp_update_nav_menu_item filter is applied in three other places, without a $_POST action)
-                if ( ! empty( $_POST['menu-item-db-id'] ) ) {
-                        update_post_meta( $menu_item_db_id, 'cpcm-unfold', (!empty( $_POST['menu-item-cpcm-unfold'][$menu_item_db_id]) ) );
-                        update_post_meta( $menu_item_db_id, 'cpcm-orderby', (empty( $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) ? "none" : $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) );
-                        update_post_meta( $menu_item_db_id, 'cpcm-order', (empty( $_POST['menu-item-cpcm-order'][$menu_item_db_id]) ? "DESC" : $_POST['menu-item-cpcm-order'][$menu_item_db_id]) );
-                        update_post_meta( $menu_item_db_id, 'cpcm-item-count', (int) (empty( $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) );
-                        update_post_meta( $menu_item_db_id, 'cpcm-item-titles', (empty( $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) ? "%post_title" : $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) );
-                } // if 
+            // Only inspect the values if the $_POST variable contains data (the wp_update_nav_menu_item filter is applied in three other places, without a $_POST action)
+            if ( ! empty( $_POST['menu-item-db-id'] ) ) {
+                update_post_meta( $menu_item_db_id, 'cpcm-unfold', (!empty( $_POST['menu-item-cpcm-unfold'][$menu_item_db_id]) ) );
+                update_post_meta( $menu_item_db_id, 'cpcm-orderby', (empty( $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) ? "none" : $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) );
+                update_post_meta( $menu_item_db_id, 'cpcm-order', (empty( $_POST['menu-item-cpcm-order'][$menu_item_db_id]) ? "DESC" : $_POST['menu-item-cpcm-order'][$menu_item_db_id]) );
+                update_post_meta( $menu_item_db_id, 'cpcm-item-count', (int) (empty( $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) );
+                update_post_meta( $menu_item_db_id, 'cpcm-item-titles', (empty( $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) ? "%post_title" : $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) );
+            } // if 
         } // function
 
 } // class
 
 class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
 	function start_el(&$output, $item, $depth, $args) {
-        	global $_wp_nav_menu_max_depth;
+        global $_wp_nav_menu_max_depth;
 		$_wp_nav_menu_max_depth = $depth > $_wp_nav_menu_max_depth ? $depth : $_wp_nav_menu_max_depth;
 
 		$indent = ( $depth ) ? str_repeat( "\t", $depth ) : '';
@@ -303,55 +316,53 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
 					</label>
 				</p>
 
-                                <?php /* BEGIN CATEGORY POSTS IN CUSTOM MENU */ if( 'taxonomy' == $item->type && (('Category' == $item->type_label) || ('Post Tag' == $item->type_label))) : ?>
-                                        <div class="cpmp-description">
-				                <p class="field-cpcm-unfold description description-wide">
-					                <label for="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>">
-						                <input type="checkbox" id="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-unfold" name="menu-item-cpcm-unfold[<?php echo $item_id; ?>]" <?php checked( get_post_meta($item_id, "cpcm-unfold", true), true )  ?> /> Replace with links to posts <?php if ('Category' == $item->type_label) echo 'in this category'; else if ('Post Tag' == $item->type_label) echo 'with this tag'; ?>.
-					                </label>
-				                </p>
-				                <p class="field-cpcm-item-count description description-thirds">
-					                <label for="edit-menu-item-cpcm-item-count-<?php echo $item_id; ?>">
-						                <?php _e( 'Number of Posts' ); ?><br />
-						                <input type="text" id="edit-menu-item-cpcm-item-count-<?php echo $item_id; ?>" class="widefat code edit-menu-item-cpcm-item-count" name="menu-item-cpcm-item-count[<?php echo $item_id; ?>]" value="<?php $item_count = get_post_meta($item_id, "cpcm-item-count", true); echo $item_count != '' ? $item_count : '-1'; ?>" />
-					                </label>
-				                </p>
-				                <p class="field-cpcm-orderby description description-thirds">
-					                <label for="edit-menu-item-cpcm-orderby-<?php echo $item_id; ?>">
-						                <?php _e( 'Order By' ); ?><br />
-						                <select id="edit-menu-item-cpcm-orderby-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-orderby" name="menu-item-cpcm-orderby[<?php echo $item_id; ?>]">
-							                <option value="none" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "none" )  ?>><?php _e('None'); ?></option>
-							                <option value="ID" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "ID" )  ?>><?php _e('ID'); ?></option>
-							                <option value="author" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "author" )  ?>><?php _e('Author'); ?></option>
-							                <option value="title" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "title" )  ?>><?php _e('Title'); ?></option>
-							                <option value="date" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "date" )  ?>><?php _e('Date'); ?></option>
-							                <option value="modified" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "modified" )  ?>><?php _e('Last Modified'); ?></option>
-							                <option value="parent" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "parent" )  ?>><?php _e('Post/Page Parent ID'); ?></option>
-							                <option value="rand" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "rand" )  ?>><?php _e('Random Order'); ?></option>
-							                <option value="comment_count" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "comment_count" )  ?>><?php _e('Number of Comments'); ?></option>
-						                </select>
-					                </label>
-				                </p>
-				                <p class="field-cpcm-order description description-thirds">
-					                <label for="edit-menu-item-cpcm-order-<?php echo $item_id; ?>">
-						                <?php _e( 'Order' ); ?><br />
-						                <select id="edit-menu-item-cpcm-order-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-order" name="menu-item-cpcm-order[<?php echo $item_id; ?>]">
-							                <option value="DESC" <?php selected( get_post_meta($item_id, "cpcm-order", true), "DESC" )  ?>><?php _e('Descending'); ?></option>
-							                <option value="ASC" <?php selected( get_post_meta($item_id, "cpcm-order", true), "ASC" )  ?>><?php _e('Ascending'); ?></option>
-						                </select>
-					                </label>
-				                </p>
-				                <p class="field-cpcm-item-titles description description-wide">
-					                <label for="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>">
-						                <?php _e( 'Post Navigation Label' ); ?><br />
-						                <input type="text" id="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>" class="widefat code edit-menu-item-cpcm-item-titles" name="menu-item-cpcm-item-titles[<?php echo $item_id; ?>]" value="<?php $item_titles = get_post_meta($item_id, "cpcm-item-titles", true); echo $item_titles != '' ? $item_titles : '%post_title' ?>" />
-						<span class="description"><?php _e('The navigation label for generated post links may be customized using the following placeholders: %post_title, %post_author.'); ?></span>
-					                </label>
-				                </p>
-                                        </div>
+                <?php /* BEGIN CATEGORY POSTS IN CUSTOM MENU */ if( 'taxonomy' == $item->type && (('Category' == $item->type_label) || ('Post Tag' == $item->type_label))) : ?>
+                    <div class="cpmp-description">
+                        <p class="field-cpcm-unfold description description-wide">
+                            <label for="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>">
+                                <input type="checkbox" id="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-unfold" name="menu-item-cpcm-unfold[<?php echo $item_id; ?>]" <?php checked( get_post_meta($item_id, "cpcm-unfold", true), true )  ?> /> Replace with links to posts <?php if ('Category' == $item->type_label) echo 'in this category'; else if ('Post Tag' == $item->type_label) echo 'with this tag'; ?>.
+                            </label>
+                        </p>
+                        <p class="field-cpcm-item-count description description-thirds">
+                            <label for="edit-menu-item-cpcm-item-count-<?php echo $item_id; ?>">
+                                <?php _e( 'Number of Posts' ); ?><br />
+                                <input type="text" id="edit-menu-item-cpcm-item-count-<?php echo $item_id; ?>" class="widefat code edit-menu-item-cpcm-item-count" name="menu-item-cpcm-item-count[<?php echo $item_id; ?>]" value="<?php $item_count = get_post_meta($item_id, "cpcm-item-count", true); echo $item_count != '' ? $item_count : '-1'; ?>" />
+                            </label>
+                        </p>
+                        <p class="field-cpcm-orderby description description-thirds">
+                            <label for="edit-menu-item-cpcm-orderby-<?php echo $item_id; ?>">
+                                <?php _e( 'Order By' ); ?><br />
+                                <select id="edit-menu-item-cpcm-orderby-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-orderby" name="menu-item-cpcm-orderby[<?php echo $item_id; ?>]">
+                                    <option value="none" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "none" )  ?>><?php _e('None'); ?></option>
+                                    <option value="ID" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "ID" )  ?>><?php _e('ID'); ?></option>
+                                    <option value="author" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "author" )  ?>><?php _e('Author'); ?></option>
+                                    <option value="title" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "title" )  ?>><?php _e('Title'); ?></option>
+                                    <option value="date" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "date" )  ?>><?php _e('Date'); ?></option>
+                                    <option value="modified" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "modified" )  ?>><?php _e('Last Modified'); ?></option>
+                                    <option value="parent" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "parent" )  ?>><?php _e('Post/Page Parent ID'); ?></option>
+                                    <option value="rand" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "rand" )  ?>><?php _e('Random Order'); ?></option>
+                                    <option value="comment_count" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "comment_count" )  ?>><?php _e('Number of Comments'); ?></option>
+                                </select>
+                            </label>
+                        </p>
+                        <p class="field-cpcm-order description description-thirds">
+                            <label for="edit-menu-item-cpcm-order-<?php echo $item_id; ?>">
+                                <?php _e( 'Order' ); ?><br />
+                                <select id="edit-menu-item-cpcm-order-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-order" name="menu-item-cpcm-order[<?php echo $item_id; ?>]">
+                                    <option value="DESC" <?php selected( get_post_meta($item_id, "cpcm-order", true), "DESC" )  ?>><?php _e('Descending'); ?></option>
+                                    <option value="ASC" <?php selected( get_post_meta($item_id, "cpcm-order", true), "ASC" )  ?>><?php _e('Ascending'); ?></option>
+                                </select>
+                            </label>
+                        </p>
+                        <p class="field-cpcm-item-titles description description-wide">
+                            <label for="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>">
+                                <?php _e( 'Post Navigation Label' ); ?><br />
+                                <input type="text" id="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>" class="widefat code edit-menu-item-cpcm-item-titles" name="menu-item-cpcm-item-titles[<?php echo $item_id; ?>]" value="<?php $item_titles = get_post_meta($item_id, "cpcm-item-titles", true); echo $item_titles != '' ? esc_attr( $item_titles ) : '%post_title' ?>" />
+                                <span class="description"><?php _e('The navigation label for generated post links may be customized using the following placeholders: %post_title, %post_author.'); ?></span>
+                            </label>
+                        </p>
+                    </div>
 				<?php endif; /* CATEGORY POSTS IN CUSTOM MENU END */ ?>
-
-
 
 				<div class="menu-item-actions description-wide submitbox">
 					<?php if( 'custom' != $item->type && $original_title !== false ) : ?>
