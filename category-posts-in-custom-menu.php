@@ -3,7 +3,7 @@
     Plugin Name: Category Posts in Custom Menu
     Plugin URI: http://diana.imyou.nl/category-posts-in-custom-menu
     Description: This plugin replaces selected Category links / Post Tag links in a Custom Menu by a list of their posts.
-    Version: 0.3
+    Version: 0.4
     Author: Diana Koenraadt
     Author URI: http://diana.imyou.nl
     License: GPL2
