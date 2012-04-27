@@ -316,11 +316,11 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
 					</label>
 				</p>
 
-                <?php /* BEGIN CATEGORY POSTS IN CUSTOM MENU */ if( 'taxonomy' == $item->type && (('Category' == $item->type_label) || ('Post Tag' == $item->type_label))) : ?>
+                <?php /* BEGIN CATEGORY POSTS IN CUSTOM MENU */ if( 'taxonomy' == $item->type && (('Category' == $item->type_label) || ('Post Tag' == $item->type_label) || ('Tag' == $item->type_label))) : ?>
                     <div class="cpmp-description">
                         <p class="field-cpcm-unfold description description-wide">
                             <label for="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>">
-                                <input type="checkbox" id="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-unfold" name="menu-item-cpcm-unfold[<?php echo $item_id; ?>]" <?php checked( get_post_meta($item_id, "cpcm-unfold", true), true )  ?> /> Replace with links to posts <?php if ('Category' == $item->type_label) echo 'in this category'; else if ('Post Tag' == $item->type_label) echo 'with this tag'; ?>.
+                                <input type="checkbox" id="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>" class="edit-menu-item-cpcm-unfold" name="menu-item-cpcm-unfold[<?php echo $item_id; ?>]" <?php checked( get_post_meta($item_id, "cpcm-unfold", true), true )  ?> /> Replace with links to posts<?php if ('Category' == $item->type_label) echo ' in this category'; else if (('Tag' == $item->type_label) || ('Post Tag' == $item->type_label)) echo ' with this tag'; ?>.
                             </label>
                         </p>
                         <p class="field-cpcm-item-count description description-thirds">
@@ -358,7 +358,7 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
                             <label for="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>">
                                 <?php _e( 'Post Navigation Label' ); ?><br />
                                 <input type="text" id="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>" class="widefat code edit-menu-item-cpcm-item-titles" name="menu-item-cpcm-item-titles[<?php echo $item_id; ?>]" value="<?php $item_titles = get_post_meta($item_id, "cpcm-item-titles", true); echo $item_titles != '' ? esc_attr( $item_titles ) : '%post_title' ?>" />
-                                <span class="description"><?php _e('The navigation label for generated post links may be customized using the following placeholders: %post_title, %post_author.'); ?></span>
+                                <span class="description"><?php _e('The navigation label for generated post links may be customized using the following placeholders: %post_title, %post_author, %post_my_field (for custom field \'my field\' or \'my_field\').'); ?></span>
                             </label>
                         </p>
                     </div>
