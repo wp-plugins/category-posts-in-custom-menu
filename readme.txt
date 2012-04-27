@@ -15,6 +15,7 @@ The custom menu only allows adding a link that leads to a category or tag page. 
 Enable the plugin and go to Appearance > Menus. Create your Custom Menu. If you use Categories or Post Tags in your Custom Menu, be sure to <b>save the menu first</b>. Next, you can choose whether you would like to list the original link, or if you would like to replace it by the posts in that taxonomy (Category/Post Tag). Note that custom taxonomies and post types are not supported at the moment. 
 
 For each Category or Post Tag item in the menu, you now have the following extra configuration options: 
+
 * replace the link by a list of posts in the menu y/n; 
 * specify the (maximum) number of posts you want to show for this item (-1 = all), and
 * their ordering (ascending/descending by none, ID, author, title, date, modified, parent, rand or comment_count); 
