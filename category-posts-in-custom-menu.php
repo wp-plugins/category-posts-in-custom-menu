@@ -9,7 +9,7 @@
     License: GPL2
 */
 
-/*  Copyright 2011 Diana Koenraadt (email : diana@imyou.nl)
+/*  Copyright 2011 Diana Koenraadt (email : diana att imyou dott nl)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
