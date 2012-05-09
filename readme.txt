@@ -1,15 +1,17 @@
 === Category Posts in Custom Menu ===
 Contributors: anaid
-Tags: menu, category, post tag, posts, dynamic, automatic
+Tags: menu, category, post tag, tag, posts, dynamic, automatic, custom, taxonomy, custom taxonomy
 Requires at least: 3.2.1
 Tested up to: 3.3.2
-Stable tag: 0.4
+Stable tag: 0.5
 
-Dynamic menus: This plugin automatically replaces selected Category links / Post Tag links in a Custom Menu by a list of their posts.
+Dynamic menus: This plugin automatically replaces selected Category links / Post Tag links / Custom Taxonomy links in a Custom Menu by a list of their posts.
 
 == Description ==
 
-The custom menu only allows adding a link that leads to a category or tag page. I wanted to insert all posts from a certain category/tag into the menu, so I wrote a little plug-in. If you want to list posts the posts <b>themselves</b> in the menu and if you want Wordpress to do this automatically for you, then I hope you will find this plugin useful. 
+The custom menu only allows adding a link that leads to a category or tag page. I wanted to insert all posts from a certain category/tag themselves into the menu, so I wrote a little plug-in. If you want to list posts the posts <b>themselves</b> in the menu and if you want Wordpress to do this automatically for you, then I hope you will find this plugin useful. 
+
+<strong>Now also works for custom taxonomies!</strong>
 
 = Using it =
 Enable the plugin and go to Appearance > Menus. Create your Custom Menu. If you use Categories or Post Tags in your Custom Menu, be sure to <b>save the menu first</b>. Next, you can choose whether you would like to list the original link, or if you would like to replace it by the posts in that taxonomy (Category/Post Tag). Note that custom taxonomies and post types are not supported at the moment. 
@@ -29,6 +31,11 @@ This plugin uses the wp_nav_menu_objects filter hook to remove and replace categ
 1. Go to Appearance > Menu to enable/disable and set the options for the replacement of Category / Post Tag links by their posts.
 
 == Changelog ==
+
+0.5
+
+* Enable custom taxonomies.
+* Change plugin URL.
 
 0.4
 
@@ -63,6 +70,10 @@ Added checkboxes, dropdowns and text fields to Appearance > Menu. It is now poss
 
 Problem: "I can't see what effect it has had. Nothing has changed (not that I can see) in the Appearance > Menu page. Just like before." 
 
-Solution: Issue 14527 (http://core.trac.wordpress.org/ticket/14527) is the cause. When adding a menu item but <i>before</i> saving it, you will indeed see none of the promised checkboxes. So be sure to <b>save your menu</b> after you add a Category/Tag to your menu. <i>Then</i> you'll see the added functionality.
+Two possible causes:
+<ul>
+<li>Issue 14527 (http://core.trac.wordpress.org/ticket/14527) is the cause. When adding a menu item but <i>before</i> saving it, you will indeed see none of the promised checkboxes. So be sure to <b>save your menu</b> after you add a Category/Tag to your menu. <i>Then</i> you'll see the added functionality.
 
-The reason is because the hook that is used to extend the functionality is not being applied until you've saved the item. A patch is approved for 3.4, after which I can fix this :)
+The reason is because the hook that is used to extend the functionality is not being applied until you've saved the item. A patch is approved for 3.4, after which I can fix this :)</li>
+<li>You're already using another plugin that changes the Appearance > Menu page that has a higher priority than mine.</li>
+</ul>

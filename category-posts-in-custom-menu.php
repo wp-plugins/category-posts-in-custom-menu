@@ -1,15 +1,15 @@
 <?php
 /*
     Plugin Name: Category Posts in Custom Menu
-    Plugin URI: http://diana.imyou.nl/category-posts-in-custom-menu
+    Plugin URI: http://blog.dianakoenraadt.nl
     Description: This plugin replaces selected Category links / Post Tag links in a Custom Menu by a list of their posts.
-    Version: 0.4
+    Version: 0.5
     Author: Diana Koenraadt
-    Author URI: http://diana.imyou.nl
+    Author URI: http://www.dianakoenraadt.nl
     License: GPL2
 */
 
-/*  Copyright 2011 Diana Koenraadt (email : diana att imyou dott nl)
+/*  Copyright 2011 Diana Koenraadt (email : diana at dianakoenraadt dot nl)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
@@ -86,82 +86,68 @@ class CPCM_Manager {
         } // function
 
         /* 
-        * Build the menu structure for display: Replace taxonomies (category, tags) that have been marked as such, by their posts.
+        * Build the menu structure for display: Replace taxonomies (category, tags or custom taxonomies) that have been marked as such, by their posts.
         */
         function cpcm_replace_taxonomy_by_posts( $sorted_menu_items, $args ) {
 	        $result = array();    
 	        $inc = 0;
 	        foreach ( (array) $sorted_menu_items as $key => $menu_item ) {
-		        // Replace category object by a list of its posts: Append posts to $result
-		        // Remove the category object itself.
-                if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "cpcm-unfold", true) == '1')) {
-			        $inc += -1;
-                    $query_arr = array();
+              // Replace taxonomy object by a list of its posts: Append posts to $result
+              // Remove the taxonomy object itself.
+              if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "cpcm-unfold", true) == '1')) {
+                  $inc += -1;
+                  $query_arr = array();
 
-                    /* 
-                    * Map 'category' to cat id and 'post_tag' to tag id. Also does this for custom taxonomy types, 
-                    * but right now only categories and post tags are supported. 
-                    * (Note to self: custom taxonomies can have custom post types too.)
-                    */
-                    $query_arr[$menu_item->object] = $menu_item->object_id; 
+                  $query_arr[$menu_item->object] = $menu_item->title; 
 
-                    /* 
-                    * Check that the taxonomy item was in fact a category or post tag. 
-                    * Currently, only these two taxonomy types are supported.
-                    * So for any other taxonomy type, it will skip the if-then and will reach the default behavior.
-                    */
-                    if ( array_key_exists ( 'category' , $query_arr ) || array_key_exists ( 'post_tag' , $query_arr )) {
-                        // If cpcm-unfold is true, the following custom fields exist:
-                        $query_arr['order'] = get_post_meta($menu_item->db_id, "cpcm-order", true);
-                        $query_arr['orderby'] = get_post_meta($menu_item->db_id, "cpcm-orderby", true);
-                        $query_arr['numberposts'] = get_post_meta($menu_item->db_id, "cpcm-item-count", true); // default value of -1 returns all posts
+                  // If cpcm-unfold is true, the following custom fields exist:
+                  $query_arr['order'] = get_post_meta($menu_item->db_id, "cpcm-order", true);
+                  $query_arr['orderby'] = get_post_meta($menu_item->db_id, "cpcm-orderby", true);
+                  $query_arr['numberposts'] = get_post_meta($menu_item->db_id, "cpcm-item-count", true); // default value of -1 returns all posts
 
-                        $posts = get_posts( $query_arr );
+                  $posts = get_posts( $query_arr );
 
-                        foreach( (array) $posts as $pkey => $post ) {
-                            // Decorate the posts with the required data for a menu-item.
-                            $posts[$pkey] = wp_setup_nav_menu_item( $posts[$pkey] );
-                            $posts[$pkey]->menu_item_parent = $menu_item->menu_item_parent; // Set to parent of category page.
+                  foreach( (array) $posts as $pkey => $post ) {
+                      // Decorate the posts with the required data for a menu-item.
+                      $posts[$pkey] = wp_setup_nav_menu_item( $posts[$pkey] );
+                      $posts[$pkey]->menu_item_parent = $menu_item->menu_item_parent; // Set to parent of taxonomy item.
 
-                            // Set the title of the new menu item
-                            $posts[$pkey]->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
+                      // Set the title of the new menu item
+                      $posts[$pkey]->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
 
-                            // Replace the placeholders in the title by the properties of the post
-                            $userdata = get_userdata($posts[$pkey]->post_author);
-                            $posts[$pkey]->title = str_replace( "%post_author", 	$userdata ? $userdata->display_name : '', 	$posts[$pkey]->title);
-                            $posts[$pkey]->title = str_replace( "%post_title", 	$posts[$pkey]->post_title, 	$posts[$pkey]->title);
-                                                        
-                            $custom_field_keys = get_post_custom_keys($posts[$pkey]->ID);
-                            foreach ( $custom_field_keys as $key => $value ) {
-                                $valuet = trim($value);
-                                if ( '_' == $valuet{0} )
-                                    continue;
-                                $meta = get_post_meta($posts[$pkey]->ID, $valuet, true);
-                                $valuet_str = str_replace(' ', '_', $valuet);
-                                $posts[$pkey]->title = str_replace( "%post_" . $valuet_str, $meta, $posts[$pkey]->title);
-                            }
-                            // Remove remaining %post_ occurrences.
-                            $pattern = "/%post_\w+/";
-                            $posts[$pkey]->title = preg_replace($pattern, '', $posts[$pkey]->title);
+                      // Replace the placeholders in the title by the properties of the post
+                      $userdata = get_userdata($posts[$pkey]->post_author);
+                      $posts[$pkey]->title = str_replace( "%post_author", 	$userdata ? $userdata->display_name : '', 	$posts[$pkey]->title);
+                      $posts[$pkey]->title = str_replace( "%post_title", 	$posts[$pkey]->post_title, 	$posts[$pkey]->title);
+                                                  
+                      $custom_field_keys = get_post_custom_keys($posts[$pkey]->ID);
+                      foreach ( $custom_field_keys as $key => $value ) {
+                          $valuet = trim($value);
+                          if ( '_' == $valuet{0} )
+                              continue;
+                          $meta = get_post_meta($posts[$pkey]->ID, $valuet, true);
+                          $valuet_str = str_replace(' ', '_', $valuet);
+                          $posts[$pkey]->title = str_replace( "%post_" . $valuet_str, $meta, $posts[$pkey]->title);
+                      }
+                      // Remove remaining %post_ occurrences.
+                      $pattern = "/%post_\w+/";
+                      $posts[$pkey]->title = preg_replace($pattern, '', $posts[$pkey]->title);
 
-                            $inc += 1;
-                        }
-                        // Extend the items with classes.
-                        _wp_menu_item_classes_by_context( $posts );
-                        // Append the new menu_items to the menu array that we're building.
-                        $result = array_merge( $result, $posts ); 
+                      $inc += 1;
+                  }
+                  // Extend the items with classes.
+                  _wp_menu_item_classes_by_context( $posts );
+                  // Append the new menu_items to the menu array that we're building.
+                  $result = array_merge( $result, $posts );
+              } else {
+                // Treat other objects as usual, but note that the position 
+                // of elements in the array changes.
+                $result[$menu_item->menu_order + $inc] = $menu_item;
+              }
+            }
 
-                        continue; // We've handled this case, don't visit the case for other objects.
-                    }
-                }
-
-		        // Treat other objects as usual, but note that the position 
-		        // of elements in the array changes.
-		        $result[$menu_item->menu_order + $inc] = $menu_item;
-	        }
-
-	        unset( $sorted_menu_items );
-	        return $result;
+            unset( $sorted_menu_items );
+            return $result;
         } // function
 
         /*
@@ -199,7 +185,7 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
 		);
 
 		$original_title = '';
-		if ( 'taxonomy' == $item->type ) {
+		if ( $item->type == 'taxonomy' ) {
 			$original_title = get_term_field( 'name', $item->object_id, $item->object, 'raw' );
 			if ( is_wp_error( $original_title ) )
 				$original_title = false;
@@ -316,11 +302,11 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
 					</label>
 				</p>
 
-                <?php /* BEGIN CATEGORY POSTS IN CUSTOM MENU */ if( 'taxonomy' == $item->type && (('Category' == $item->type_label) || ('Post Tag' == $item->type_label) || ('Tag' == $item->type_label))) : ?>
+                <?php /* BEGIN CATEGORY POSTS IN CUSTOM MENU */ if( $item->type == 'taxonomy' ) : ?>
                     <div class="cpmp-description">
                         <p class="field-cpcm-unfold description description-wide">
                             <label for="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>">
-                                <input type="checkbox" id="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>" class="edit-menu-item-cpcm-unfold" name="menu-item-cpcm-unfold[<?php echo $item_id; ?>]" <?php checked( get_post_meta($item_id, "cpcm-unfold", true), true )  ?> /> Replace with links to posts<?php if ('Category' == $item->type_label) echo ' in this category'; else if (('Tag' == $item->type_label) || ('Post Tag' == $item->type_label)) echo ' with this tag'; ?>.
+                                <input type="checkbox" id="edit-menu-item-cpcm-unfold-<?php echo $item_id; ?>" class="edit-menu-item-cpcm-unfold" name="menu-item-cpcm-unfold[<?php echo $item_id; ?>]" <?php checked( get_post_meta($item_id, "cpcm-unfold", true), true )  ?> /> Replace with links to posts<?php if ('Category' == $item->type_label) echo ' in this category'; else if (('Tag' == $item->type_label) || ('Post Tag' == $item->type_label)) echo ' with this tag'; else echo ' in this taxonomy'; ?>.
                             </label>
                         </p>
                         <p class="field-cpcm-item-count description description-thirds">
