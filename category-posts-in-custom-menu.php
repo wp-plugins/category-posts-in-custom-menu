@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: Category Posts in Custom Menu
-Plugin URI: http://diana.imyou.nl/category-posts-in-custom-menu
+Plugin URI: http://blog.dianakoenraadt.nl
 Description: This plugin replaces all Category-links in a Custom Menu by a list of the posts in that category.
 Version: 0.1
 Author: Diana Koenraadt
@@ -10,7 +10,7 @@ License: GPL2
 */
 ?>
 <?php
-/*  Copyright YEAR  PLUGIN_AUTHOR_NAME  (email : PLUGIN AUTHOR EMAIL)
+/*  Copyright YEAR  PLUGIN_AUTHOR_NAME  (email : diana at dianakoenraadt dot nl)
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License, version 2, as 
