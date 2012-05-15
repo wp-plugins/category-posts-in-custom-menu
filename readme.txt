@@ -11,7 +11,7 @@ Dynamic menus: This plugin automatically replaces selected Category links / Post
 
 The custom menu only allows adding a link that leads to a category or tag page. I wanted to insert all posts from a certain category/tag themselves into the menu, so I wrote a little plug-in. If you want to list posts the posts <b>themselves</b> in the menu and if you want Wordpress to do this automatically for you, then I hope you will find this plugin useful. 
 
-<strong>Now also works for custom taxonomies!</strong>
+<strong>Now also works for custom post taxonomies!</strong>
 
 = Using it =
 Enable the plugin and go to Appearance > Menus. Create your Custom Menu. If you use Categories or Post Tags in your Custom Menu, be sure to <b>save the menu first</b>. Next, you can choose whether you would like to list the original link, or if you would like to replace it by the posts in that taxonomy (Category/Post Tag). Note that custom taxonomies and post types are not supported at the moment. 
