@@ -98,7 +98,11 @@ class CPCM_Manager {
                   $inc += -1;
                   $query_arr = array();
 
-                  $query_arr[$menu_item->object] = $menu_item->title; 
+                  //$query_arr[$menu_item->object] = $menu_item->title; 
+                  $query_arr['tax_query'] = array(array('taxonomy'=>$menu_item->object,
+                    'field'=>'id',
+                    'terms'=>$menu_item->object_id
+                  ));
 
                   // If cpcm-unfold is true, the following custom fields exist:
                   $query_arr['order'] = get_post_meta($menu_item->db_id, "cpcm-order", true);
