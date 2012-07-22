@@ -2,8 +2,8 @@
 Contributors: anaid
 Tags: menu, category, post tag, tag, posts, dynamic, automatic, custom, taxonomy, custom taxonomy
 Requires at least: 3.2.1
-Tested up to: 3.3.2
-Stable tag: 0.5
+Tested up to: 3.4.1
+Stable tag: 0.6
 
 Dynamic menus: This plugin automatically replaces selected Category links / Post Tag links / Custom Taxonomy links in a Custom Menu by a list of their posts.
 
@@ -19,9 +19,9 @@ Enable the plugin and go to Appearance > Menus. Create your Custom Menu. If you 
 For each Category or Post Tag item in the menu, you now have the following extra configuration options: 
 
 * replace the link by a list of posts in the menu y/n; 
-* specify the (maximum) number of posts you want to show for this item (-1 = all), and
+* specify the (maximum) number of posts you want to show for this item (-1 = all);
 * their ordering (ascending/descending by none, ID, author, title, date, modified, parent, rand or comment_count); 
-* specify the title for the menu items: for this you can use the wildcards %post_title and %post_author, or wildcards for custom fields, like %post_my_field, where 'my field' or 'my_field' is a custom field;
+* specify the title for the menu items. For this you can use the following wildcards: %post_title, %post_author, %post_feat_image (url only), %post_excerpt, %post_url, %post_date, %post_date_gmt, %post_status, %post_modified, %post_modified_gmt, %post_comment_count or wildcards for custom fields, like %post_my_field, where 'my field' or 'my_field' is a custom field;
 
 = Details =
 This plugin uses the wp_nav_menu_objects filter hook to remove and replace category items in the menu by the posts in that category. It extends Walker_Nav_Menu_Edit to add input fields to Appearance > Menus and adds some CSS to style this properly.
@@ -31,6 +31,10 @@ This plugin uses the wp_nav_menu_objects filter hook to remove and replace categ
 1. Go to Appearance > Menu to enable/disable and set the options for the replacement of Category / Post Tag links by their posts.
 
 == Changelog ==
+
+0.6
+
+* Added a bunch of wildcards: %post_feat_image (url only), %post_excerpt, %post_url, %post_date, %post_date_gmt, %post_status, %post_modified, %post_modified_gmt, %post_comment_count
 
 0.5
 
