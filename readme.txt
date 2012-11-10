@@ -60,39 +60,39 @@ Wordpress places a link around the title you create. For example, if you set the
 
 then Wordpress creates, for example:
 
-&lt;a href="link_to_post1"&gt;<strong>Chocolate pie by Anna</strong>&lt;/a&gt;
-which results in
-<a href="link_to_post1">Chocolate pie by Anna</a>
+&lt;a href="link_to_post1"&gt;<strong>Chocolate pie by Anna</strong>&lt;/a&gt;<br />
+which results in<br />
+<a href="link_to_post1">Chocolate pie by Anna</a><br />
 
 Some things you can do:
 
 <ul>
-<li>Set title: <strong>%post_title&lt;/a&gt; by %post_author</strong>
-
-Then Wordpress creates:
-
-&lt;a href="link_to_post1"&gt;<strong>Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;
-which results in
-<a href="link_to_post1">Chocolate pie</a> by Anna</a>
-
+<li>Set title: <strong>%post_title&lt;/a&gt; by %post_author</strong><br />
+<br />
+Then Wordpress creates:<br />
+<br />
+&lt;a href="link_to_post1"&gt;<strong>Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;<br />
+which results in<br />
+<a href="link_to_post1">Chocolate pie</a> by Anna</a><br />
+<br />
 (Yes, there's an extra closing &lt;/a&gt; but that doesn't really matter.)
 </li>
 <li>
-Set title: <strong>&lt;a href="http://www.mysite.com/something/"&gt;%post_title&lt;/a&gt; by %post_author</strong>
-
-Then Wordpress creates:
-&lt;a href="link_to_post1"&gt;<strong>&lt;a href="http://www.mysite.com/something/"&gt;Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;
-&lt;a href="link_to_post2"&gt;<strong>&lt;a href="http://www.mysite.com/something/"&gt;Strawberry muffins&lt;/a&gt; by Susan</strong>&lt;/a&gt;
-
+Set title: <strong>&lt;a href="http://www.mysite.com/something/"&gt;%post_title&lt;/a&gt; by %post_author</strong><br />
+<br />
+Then Wordpress creates:<br />
+&lt;a href="link_to_post1"&gt;<strong>&lt;a href="http://www.mysite.com/something/"&gt;Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;<br />
+&lt;a href="link_to_post2"&gt;<strong>&lt;a href="http://www.mysite.com/something/"&gt;Strawberry muffins&lt;/a&gt; by Susan</strong>&lt;/a&gt;<br />
+<br />
 Note that <strong>all</strong> post links will point to the same URL.
 </li>
 <li>
-Set title: <strong>&lt;a href="%post_url#myhashtag"&gt;%post_title&lt;/a&gt; by %post_author</strong>
-
-Then Wordpress creates:
-&lt;a href="link_to_post1"&gt;<strong>&lt;a href="link_to_post1#myhashtag"&gt;Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;
-&lt;a href="link_to_post2"&gt;<strong>&lt;a href="link_to_post2#myhashtag"&gt;Strawberry muffins&lt;/a&gt; by Susan</strong>&lt;/a&gt;
-
+Set title: <strong>&lt;a href="%post_url#myhashtag"&gt;%post_title&lt;/a&gt; by %post_author</strong><br />
+<br />
+Then Wordpress creates:<br />
+&lt;a href="link_to_post1"&gt;<strong>&lt;a href="link_to_post1#myhashtag"&gt;Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;<br />
+&lt;a href="link_to_post2"&gt;<strong>&lt;a href="link_to_post2#myhashtag"&gt;Strawberry muffins&lt;/a&gt; by Susan</strong>&lt;/a&gt;<br />
+<br />
 You can use this to have menu item links skip to a certain paragraph if you're using anchors in your HTML.
 </li>
 </ul>
