@@ -21,7 +21,7 @@ For each Category or Post Tag item in the menu, you now have the following extra
 * replace the link by a list of posts in the menu y/n; 
 * specify the (maximum) number of posts you want to show for this item (-1 = all);
 * their ordering (ascending/descending by none, ID, author, title, date, modified, parent, rand or comment_count); 
-* specify the title for the menu items. For this you can use %post_title, %post_author and other wildcards, see 'Wildcards'.
+* specify the title for the menu items. For this you can use %post_title, %post_author and other wildcards, see 'Other Notes > Wildcards'.
 
 = Details =
 This plugin uses the wp_nav_menu_objects filter hook to remove and replace category items in the menu by the posts in that category. It extends Walker_Nav_Menu_Edit to add input fields to Appearance > Menus and adds some CSS to style this properly.
@@ -104,6 +104,8 @@ which results in <br />
 You can use this to have menu item links skip to a certain paragraph if you're using anchors in your HTML.
 </li>
 </ul>
+
+You can freely use HTML in the menu items.
 
 == Screenshots ==
 
