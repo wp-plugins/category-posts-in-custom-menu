@@ -84,6 +84,10 @@ Then Wordpress creates:<br />
 &lt;a href="link_to_post1"&gt;<strong>&lt;/a&gt;&lt;a href="http://www.mysite.com/something/"&gt;Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;<br />
 &lt;a href="link_to_post2"&gt;<strong>&lt;/a&gt;&lt;a href="http://www.mysite.com/something/"&gt;Strawberry muffins&lt;/a&gt; by Susan</strong>&lt;/a&gt;<br />
 <br />
+which results in <br />
+<a href="link_to_post1"><strong></a><a href="http://www.mysite.com/something/">Chocolate pie</a> by Anna</strong></a><br />
+<a href="link_to_post2"><strong></a><a href="http://www.mysite.com/something/">Strawberry muffins</a> by Susan</strong></a><br />
+<br />
 Note that <strong>all</strong> post links will point to the same URL.
 </li>
 <li>
@@ -92,6 +96,10 @@ Set title: <strong>&lt;/a&gt;&lt;a href="%post_url#myhashtag"&gt;%post_title&lt;
 Then Wordpress creates:<br />
 &lt;a href="link_to_post1"&gt;<strong>&lt;/a&gt;&lt;a href="link_to_post1#myhashtag"&gt;Chocolate pie&lt;/a&gt; by Anna</strong>&lt;/a&gt;<br />
 &lt;a href="link_to_post2"&gt;<strong>&lt;/a&gt;&lt;a href="link_to_post2#myhashtag"&gt;Strawberry muffins&lt;/a&gt; by Susan</strong>&lt;/a&gt;<br />
+<br />
+which results in <br />
+<a href="link_to_post1"><strong></a><a href="link_to_post1#myhashtag">Chocolate pie</a> by Anna</strong></a><br />
+<a href="link_to_post2"><strong></a><a href="link_to_post2#myhashtag">Strawberry muffins</a> by Susan</strong></a><br />
 <br />
 You can use this to have menu item links skip to a certain paragraph if you're using anchors in your HTML.
 </li>
