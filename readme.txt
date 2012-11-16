@@ -113,7 +113,7 @@ You can freely use HTML in the menu items.
 
 == Changelog ==
 
-0.8
+0.7.1
 
 * Bugfix: Link Target, CSS Classes, Link Relationship (XFN) and Description weren't inherited from the original menu item. They are now.
 
