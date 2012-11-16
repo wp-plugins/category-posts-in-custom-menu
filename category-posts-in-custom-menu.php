@@ -3,7 +3,7 @@
     Plugin Name: Category Posts in Custom Menu
     Plugin URI: http://blog.dianakoenraadt.nl
     Description: This plugin replaces selected Category links / Post Tag links / Custom taxonomy links in a Custom Menu by a list of their posts/pages.
-    Version: 0.7
+    Version: 0.7.1
     Author: Diana Koenraadt
     Author URI: http://www.dianakoenraadt.nl
     License: GPL2
@@ -119,6 +119,12 @@ class CPCM_Manager {
 						// Decorate the posts with the required data for a menu-item.
 						$post = wp_setup_nav_menu_item( $post );
 						$post->menu_item_parent = $menu_item->menu_item_parent; // Set to parent of taxonomy item.
+
+						// Transfer properties from the old menu item to the new one
+						$post->target = $menu_item->target;
+						$post->classes = $menu_item->classes;
+						$post->xfn = $menu_item->xfn;
+						$post->description = $menu_item->description;
 
 						// Set the title of the new menu item
 						$post->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
