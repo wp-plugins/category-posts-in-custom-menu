@@ -85,6 +85,106 @@ class CPCM_Manager {
             return 'Walker_Nav_Menu_Edit';
         } // function
 
+		function replace_placeholders( $post, $string )
+		{
+			$custom_field_keys = get_post_custom_keys($post->ID);
+			foreach ( (array)$custom_field_keys as $key => $value ) {
+				$valuet = trim($value);
+				if ( '_' == $valuet{0} )
+				continue;
+				$meta = get_post_meta($post->ID, $valuet, true);
+				$valuet_str = str_replace(' ', '_', $valuet);
+				// Check if post_myfield occurs
+				if (substr_count($string, "%post_" . $valuet_str) > 0)
+				{
+					if (is_string($meta))
+					{
+						$string = str_replace( "%post_" . $valuet_str, $meta, $string);
+					}
+					else if (is_array($meta))
+					{
+						/*
+						* array_values() returns an integer-indexed array, thus if one compares the array in question with 
+						* its array_values() and they are equal, the original array is a 0 based, integer indexed array
+						*/
+						if ($meta == array_values($meta)) 
+						{
+							// TODO matches[1] finds first match of subexpression with () brackets, matches[2] finds second, etc.
+							// Use this to supply extra parameters: For begin, end and delimiter.
+							// named subpattern: (?P<name>pattern)
+							// using a named subpattern: (?P>name)							
+							if (preg_match( "/" . "((\((?P<lbrack>(.*))))?" . "\%post_" . $valuet_str . "(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))" . "(((?P<rbrack>(.*))\)))?" . "/", $string, $matches))
+							{
+								$arr = array();
+								foreach ( (array) $meta as $meta_key => $post_id ) 
+								{
+									$sub_post = get_post($post_id);
+									
+									// Create function that finds expressions within brackets.
+									$found = $matches['brackets'];
+									// Remove starting and trailing bracket
+									$found = substr($found, 1, strlen($found) - 2);
+									
+									$arr[] = $this->replace_placeholders($sub_post, $found);
+								}
+							}
+							
+							// Use $matches[0], this is the outermost node. Strip from that the inner information, to retain only the outer brackets.
+							$arr = implode($arr, ", ");
+							$string = preg_replace("/" . "((\((?P<lbrack>(\S*))))?" . "\%post_" . $valuet_str . "(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))" . "(((?P<rbrack>(\S*))\)))?" . "/", $matches['lbrack'] . $arr . $matches['rbrack'], $string);
+							$string = str_replace( "%post_" . $valuet_str, $arr, $string);
+						}
+					}
+				}
+			}
+			
+			$userdata = get_userdata($post->post_author);
+			$string = str_replace( "%post_author", 	$userdata ? $userdata->data->display_name : '', $string);
+
+			$featured_image = wp_get_attachment_url( get_post_thumbnail_id($post->ID) );
+			$string = str_replace( "%post_feat_image", 	$featured_image, $string);
+
+			$string = str_replace( "%post_title", 	$post->post_title, 	$string);
+			$string = str_replace( "%post_excerpt", 	$post->post_excerpt, 	$string);
+			$string = str_replace( "%post_url", 	get_permalink($post->ID), 	$string);
+
+			$post_date_gmt = $post->post_date_gmt;
+			$string = preg_replace("/\%post_date_gmt\(\)/", mysql2date('F jS, Y', $post_date_gmt), $string);
+			$string = preg_replace("/\%post_date_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date_gmt')", $string);
+			$string = str_replace( "%post_date_gmt", 	$post_date_gmt, 	$string);
+
+			$post_date = $post->post_date;
+			$string = preg_replace("/\%post_date\(\)/", mysql2date('F jS, Y', $post_date), $string);
+			$string = preg_replace("/\%post_date\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date')", $string);
+			$string = str_replace( "%post_date", 	$post_date, 	$string);
+
+			$string = str_replace( "%post_status", 	$post->post_status, 	$string);
+
+			$post_modified_gmt = $post->post_modified_gmt;
+			$string = preg_replace("/\%post_modified_gmt\(\)/", mysql2date('F jS, Y', $post_modified_gmt), $string);
+			$string = preg_replace("/\%post_modified_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified_gmt')", $string);
+			$string = str_replace( "%post_modified_gmt", 	$post_modified_gmt, 	$string);
+
+			$post_modified = $post->post_modified;
+			$string = preg_replace("/\%post_modified\(\)/", mysql2date('F jS, Y', $post_modified), $string);
+			$string = preg_replace("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified')", $string);
+			$string = str_replace( "%post_modified", 	$post_modified, 	$string);
+
+			$string = str_replace( "%post_comment_count", 	$post->comment_count, 	$string);
+			
+			// Remove remaining %post_ occurrences.
+			$pattern = "/" . "((\((?P<lbrack>(\S*))))?" . "\%post_\w+(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))" . "(((?P<rbrack>(\S*))\)))?" . "/";
+			$string = preg_replace($pattern, '', $string);
+			
+			$pattern = "/%post_\w+(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))?/";
+			$string = preg_replace($pattern, '', $string);			
+			
+			$pattern = "/%post_\w+(\(\w*\))?/"; 
+			$string = preg_replace($pattern, '', $string);
+			
+			return $string;
+		}
+		
         /* 
         * Build the menu structure for display: Replace taxonomies (category, tags or custom taxonomies) that have been marked as such, by their posts.
         */
@@ -130,52 +230,7 @@ class CPCM_Manager {
 						$post->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
 
 						// Replace the placeholders in the title by the properties of the post
-						$userdata = get_userdata($post->post_author);
-						$post->title = str_replace( "%post_author", 	$userdata ? $userdata->data->display_name : '', 	$post->title);
-
-						$featured_image = wp_get_attachment_url( get_post_thumbnail_id($post->ID) );
-						$post->title = str_replace( "%post_feat_image", 	$featured_image, 	$post->title);
-
-						$post->title = str_replace( "%post_title", 	$post->post_title, 	$post->title);
-						$post->title = str_replace( "%post_excerpt", 	$post->post_excerpt, 	$post->title);
-						$post->title = str_replace( "%post_url", 	$post->url, 	$post->title);
-
-						$post_date_gmt = $post->post_date_gmt;
-						$post->title = preg_replace("/\%post_date_gmt\(\)/", mysql2date('F jS, Y', $post_date_gmt), $post->title);
-						$post->title = preg_replace("/\%post_date_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date_gmt')", $post->title);
-						$post->title = str_replace( "%post_date_gmt", 	$post_date_gmt, 	$post->title);
-
-						$post_date = $post->post_date;
-						$post->title = preg_replace("/\%post_date\(\)/", mysql2date('F jS, Y', $post_date), $post->title);
-						$post->title = preg_replace("/\%post_date\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date')", $post->title);
-						$post->title = str_replace( "%post_date", 	$post_date, 	$post->title);
-
-						$post->title = str_replace( "%post_status", 	$post->post_status, 	$post->title);
-
-						$post_modified_gmt = $post->post_modified_gmt;
-						$post->title = preg_replace("/\%post_modified_gmt\(\)/", mysql2date('F jS, Y', $post_modified_gmt), $post->title);
-						$post->title = preg_replace("/\%post_modified_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified_gmt')", $post->title);
-						$post->title = str_replace( "%post_modified_gmt", 	$post_modified_gmt, 	$post->title);
-
-						$post_modified = $post->post_modified;
-						$post->title = preg_replace("/\%post_modified\(\)/", mysql2date('F jS, Y', $post_modified), $post->title);
-						$post->title = preg_replace("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified')", $post->title);
-						$post->title = str_replace( "%post_modified", 	$post_modified, 	$post->title);
-
-						$post->title = str_replace( "%post_comment_count", 	$post->comment_count, 	$post->title);
-
-						$custom_field_keys = get_post_custom_keys($post->ID);
-						foreach ( $custom_field_keys as $key => $value ) {
-							$valuet = trim($value);
-							if ( '_' == $valuet{0} )
-							continue;
-							$meta = get_post_meta($post->ID, $valuet, true);
-							$valuet_str = str_replace(' ', '_', $valuet);
-							$post->title = str_replace( "%post_" . $valuet_str, $meta, $post->title);
-						}
-						// Remove remaining %post_ occurrences.
-						$pattern = "/%post_\w+/";
-						$post->title = preg_replace($pattern, '', $post->title);
+						$post->title = $this->replace_placeholders($post, $post->title);
 
 						$inc += 1;
 					}
