@@ -5,7 +5,7 @@ Requires at least: 3.2.1
 Tested up to: 3.4.2
 Stable tag: 0.7.2
 
-Dynamic menus: This plugin automatically replaces selected Category links / Post Tag links / Custom Taxonomy links in a Custom Menu by a list of their posts/pages.
+Dynamic menus: This plugin automatically replaces selected Category / Post Tag / Custom Taxonomy links in a Custom Menu by a list of their posts/pages.
 
 == Description ==
 
