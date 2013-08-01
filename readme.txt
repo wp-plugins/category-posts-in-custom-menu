@@ -3,7 +3,7 @@ Contributors: anaid
 Tags: menu, category, post tag, tag, posts, dynamic, automatic, custom, taxonomy, custom taxonomy
 Requires at least: 3.2.1
 Tested up to: 3.4.2
-Stable tag: 0.7.2
+Stable tag: 0.8
 
 Dynamic menus: This plugin automatically replaces selected Category / Post Tag / Custom Taxonomy links in a Custom Menu by a list of their posts/pages.
 
@@ -18,6 +18,7 @@ Enable the plugin and go to Appearance > Menus. Create your Custom Menu. Add a t
 
 For each Category or Post Tag item in the menu, you now have the following extra configuration options: 
 
+* keep or remove the original menu item (always / only if there are no posts / never);
 * replace the link by a list of posts in the menu y/n; 
 * specify the (maximum) number of posts you want to show for this item (-1 = all);
 * their ordering (ascending/descending by none, ID, author, title, date, modified, parent, rand or comment_count); 
@@ -112,6 +113,10 @@ You can freely use HTML in the menu items.
 1. Go to Appearance > Menu to enable/disable and set the options for the replacement of Category / Post Tag links by their posts.
 
 == Changelog ==
+
+0.8
+
+* Added the option to keep or remove the original menu item. Initially, the original menu item was replaced by the list of its posts, but now you can choose for yourself whether this should be done (always / only if there are no posts / never)
 
 0.7.2
 

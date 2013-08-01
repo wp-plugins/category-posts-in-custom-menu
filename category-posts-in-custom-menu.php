@@ -3,7 +3,7 @@
     Plugin Name: Category Posts in Custom Menu
     Plugin URI: http://blog.dianakoenraadt.nl
     Description: This plugin replaces selected Category links / Post Tag links / Custom taxonomy links in a Custom Menu by a list of their posts/pages.
-    Version: 0.7.2
+    Version: 0.8
     Author: Diana Koenraadt
     Author URI: http://www.dianakoenraadt.nl
     License: GPL2
