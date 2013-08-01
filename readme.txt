@@ -18,10 +18,10 @@ Enable the plugin and go to Appearance > Menus. Create your Custom Menu. Add a t
 
 For each Category or Post Tag item in the menu, you now have the following extra configuration options: 
 
-* keep or remove the original menu item (always / only if there are no posts / never);
 * replace the link by a list of posts in the menu y/n; 
 * specify the (maximum) number of posts you want to show for this item (-1 = all);
 * their ordering (ascending/descending by none, ID, author, title, date, modified, parent, rand or comment_count); 
+* keep or remove the original menu item (always / only if there are no posts / never);
 * specify the title for the menu items. For this you can use %post_title, %post_author and other wildcards, see 'Other Notes > Wildcards'.
 
 = Details =
