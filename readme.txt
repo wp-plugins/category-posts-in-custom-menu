@@ -114,6 +114,28 @@ Added checkboxes, dropdowns and text fields to Appearance > Menu. It is now poss
 
 == Frequently Asked Questions ==
 
+= How do I use it?  =
+
+Here's a walkthrough:
+
+<ol>
+<li>Enable the Twenty Eleven theme.</li>
+<li>Disable all plugins except Category Posts in Custom Menu.</li>
+<li>Create a post with title "My test post" and add a _new_ category "CPCMtest"</li>
+<li>Save the post</li>
+<li>Go to Appearances > Menus</li>
+<li>Click "create a new menu"</li>
+<li>Give the new menu the name "CPCM"</li>
+<li>Add the category "CPCMtest" by opening "Categories", checking that category and clicking "Add to menu"</li>
+<li>Open the menu item and check "Create submenu containing links to posts with this tag."</li>
+<li>Under "Remove original menu item" choose "Never"</li>
+<li>Do not change anything else about the menu item</li>
+<li>Scroll all the way down and check under "Theme Locations" the checkbox "Primary Menu"</li>
+<li>Save the menu</li>
+</ol>
+
+If you now look at your blog, you will have a menu with only one item: "CPCMtest". If you hover over that item with the mouse, it will open, and a post is displayed titled "My test post".
+
 = Can't see it working in any way =
 
 Problem: "I can't see what effect it has had. Nothing has changed (not that I can see) in the Appearance > Menu page. Just like before." 
@@ -126,3 +148,4 @@ The reason is because the hook that is used to extend the functionality is not b
 <li>You're already using another plugin that uses the wp_nav_menu_edit hook and has a higher priority than mine. This is by design: My plugin is not critical and therefore I don't claim a high priority on the hooks. Plugins/Themes that indicate to be more important will be given priority.</li>
 <li>You're using a theme that somehow doesn't support editing the menu. Try using the default Wordpress theme to see if your problem persists. I can't offer much support if the theme is the problem, because this is my first and only plugin and I wouldn't know where to begin to solve theme problems..</li>
 </ul>
+
