@@ -3,7 +3,7 @@ Contributors: anaid
 Tags: menu, category, post tag, tag, posts, dynamic, automatic, custom, taxonomy, custom taxonomy
 Requires at least: 3.2.1
 Tested up to: 3.6
-Stable tag: 0.8
+Stable tag: 0.9
 
 Dynamic menus: This plugin automatically replaces selected Category / Post Tag / Custom Taxonomy links in a Custom Menu by a list of their posts/pages.
 
