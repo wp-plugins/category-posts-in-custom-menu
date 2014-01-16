@@ -27,6 +27,20 @@
 
 require_once( ABSPATH . 'wp-admin/includes/nav-menu.php' ); // Load all the nav menu interface functions
 
+$CurrentVer = phpversion();
+
+// Use version_compare because closures are not supported in PHP 5.2 or below
+// http://wordpress.org/support/topic/unexpected-t_function-1
+if (version_compare($CurrentVer, '5.3.0') == -1)
+{
+	require('cpcm-functions52.php');	
+}
+else
+{
+	require('cpcm-functions.php');		
+}
+
+
 new CPCM_Manager;
 
 class CPCM_Manager {
@@ -117,81 +131,7 @@ class CPCM_Manager {
 		$string = str_replace( "%post_excerpt", 	$post->post_excerpt, 	$string);
 		$string = str_replace( "%post_url", 	get_permalink($post->ID), 	$string);
 
-		$CurrentVer = phpversion();
-
-		// Use version_compare because closures are not supported in PHP 5.2 or below
-		// http://wordpress.org/support/topic/unexpected-t_function-1
-		if (version_compare($CurrentVer, '5.3.0') == -1)
-		{
-			// PHP 5.2 and downwards compatible, use preg_replace for all regular expressions
-			$post_date_gmt = $post->post_date_gmt;
-			$string = preg_replace("/\%post_date_gmt\(\)/", mysql2date('F jS, Y', $post_date_gmt), $string);
-			$string = preg_replace("/\%post_date_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date_gmt')", $string);
-			$string = str_replace( "%post_date_gmt", 	$post_date_gmt, 	$string);
-
-			$post_date = $post->post_date;
-			$string = preg_replace("/\%post_date\(\)/", mysql2date('F jS, Y', $post_date), $string);
-			$string = preg_replace("/\%post_date\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date')", $string);
-			$string = str_replace( "%post_date", 	$post_date, 	$string);
-
-			$string = str_replace( "%post_status", 	$post->post_status, 	$string);
-
-			$post_modified_gmt = $post->post_modified_gmt;
-			$string = preg_replace("/\%post_modified_gmt\(\)/", mysql2date('F jS, Y', $post_modified_gmt), $string);
-			$string = preg_replace("/\%post_modified_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified_gmt')", $string);
-			$string = str_replace( "%post_modified_gmt", 	$post_modified_gmt, 	$string);
-
-			$post_modified = $post->post_modified;
-			$string = preg_replace("/\%post_modified\(\)/", mysql2date('F jS, Y', $post_modified), $string);
-			$string = preg_replace("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified')", $string);
-			$string = str_replace( "%post_modified", 	$post_modified, 	$string);
-		}
-		else
-		{		
-			// PHP 5.3 and upwards compatible, use preg_replace_callback for regular expressions with /e parameter instead of preg_replace
-			// http://wordpress.org/support/topic/php-55-preg_replace-e-modifier-depricated?replies=1
-			$post_date_gmt = $post->post_date_gmt;
-			$string = preg_replace("/\%post_date_gmt\(\)/", mysql2date('F jS, Y', $post_date_gmt), $string);	
-			$callback = 
-				function ($matches) use ($post_date_gmt)
-				{
-					return mysql2date($matches[1], $post_date_gmt);
-				};	
-			$string = preg_replace_callback("/\%post_date_gmt\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
-			$string = str_replace( "%post_date_gmt", 	$post_date_gmt, 	$string);
-
-			$post_date = $post->post_date;
-			$string = preg_replace("/\%post_date\(\)/", mysql2date('F jS, Y', $post_date), $string);	
-			$callback = 
-				function ($matches) use ($post_date)
-				{
-					return mysql2date($matches[1], $post_date);
-				};
-			$string = preg_replace_callback("/\%post_date\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
-			$string = str_replace( "%post_date", 	$post_date, 	$string);
-
-			$string = str_replace( "%post_status", 	$post->post_status, 	$string);
-
-			$post_modified_gmt = $post->post_modified_gmt;
-			$string = preg_replace("/\%post_modified_gmt\(\)/", mysql2date('F jS, Y', $post_modified_gmt), $string);	
-			$callback = 
-				function ($matches) use ($post_modified_gmt)
-				{
-					return mysql2date($matches[1], $post_modified_gmt);
-				};
-			$string = preg_replace_callback("/\%post_modified_gmt\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
-			$string = str_replace( "%post_modified_gmt", 	$post_modified_gmt, 	$string);
-
-			$post_modified = $post->post_modified;
-			$string = preg_replace("/\%post_modified\(\)/", mysql2date('F jS, Y', $post_modified), $string);
-			$callback = 
-				function ($matches) use ($post_modified)
-				{
-					return mysql2date($matches[1], $post_modified);
-				};
-			$string = preg_replace_callback("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
-			$string = str_replace( "%post_modified", 	$post_modified, 	$string);
-		}
+		replace_dates($post, $string);
 
 		$string = str_replace( "%post_comment_count", 	$post->comment_count, 	$string);
 		
