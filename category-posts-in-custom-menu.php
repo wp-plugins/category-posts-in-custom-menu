@@ -413,6 +413,7 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
                                     <option value="parent" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "parent" )  ?>><?php _e('Post/Page Parent ID'); ?></option>
                                     <option value="rand" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "rand" )  ?>><?php _e('Random Order'); ?></option>
                                     <option value="comment_count" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "comment_count" )  ?>><?php _e('Number of Comments'); ?></option>
+									<option value="menu_order" <?php selected( get_post_meta($item_id, "cpcm-orderby", true), "menu_order" ) ?>><?php _e('Menu Order'); ?></option>
                                 </select>
                             </label>
                         </p>
