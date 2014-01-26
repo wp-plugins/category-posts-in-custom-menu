@@ -3,7 +3,7 @@
     Plugin Name: Category Posts in Custom Menu
     Plugin URI: http://blog.dianakoenraadt.nl
     Description: This plugin replaces selected Category links / Post Tag links / Custom taxonomy links in a Custom Menu by a list of their posts/pages.
-    Version: 0.9.2
+    Version: 0.9.3
     Author: Diana Koenraadt
     Author URI: http://www.dianakoenraadt.nl
     License: GPL2
@@ -125,11 +125,18 @@ class CPCM_Manager {
 		$thumb_image = wp_get_attachment_thumb_url( get_post_thumbnail_id($post->ID) );
 		$string = str_replace( "%post_feat_image_thumb", 	$thumb_image, $string); // deprecated
 		$string = str_replace( "%post_featured_image_thumb_url", 	$thumb_image, $string);
-		$string = str_replace( "%post_featured_image_thumb", 	"<img src=\"" . $thumb_image . "\" />", $string);
+		if (trim($thumb_image) == true)
+		{
+			$string = str_replace( "%post_featured_image_thumb", 	"<img src=\"" . $thumb_image . "\" />", $string);
+		}
+		
 		$featured_image = wp_get_attachment_url( get_post_thumbnail_id($post->ID) );
 		$string = str_replace( "%post_feat_image", 	$featured_image, $string); // deprecated
 		$string = str_replace( "%post_featured_image_url", 	$featured_image, $string);
-		$string = str_replace( "%post_featured_image", 	"<img src=\"" . $featured_image . "\" />", $string);
+		if (trim($featured_image) == true)
+		{
+			$string = str_replace( "%post_featured_image", 	"<img src=\"" . $featured_image . "\" />", $string);
+		}
 
 		$string = str_replace( "%post_title", 	$post->post_title, 	$string);
 		$string = str_replace( "%post_excerpt", 	$post->post_excerpt, 	$string);
