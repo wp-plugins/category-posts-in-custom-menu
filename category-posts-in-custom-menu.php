@@ -123,9 +123,13 @@ class CPCM_Manager {
 		$string = str_replace( "%post_author", 	$userdata ? $userdata->data->display_name : '', $string);
 
 		$thumb_image = wp_get_attachment_thumb_url( get_post_thumbnail_id($post->ID) );
-		$string = str_replace( "%post_feat_image_thumb", 	$thumb_image, $string);
+		$string = str_replace( "%post_feat_image_thumb", 	$thumb_image, $string); // deprecated
+		$string = str_replace( "%post_featured_image_thumb_url", 	$thumb_image, $string);
+		$string = str_replace( "%post_featured_image_thumb", 	"<img src=\"" . $thumb_image . "\" />", $string);
 		$featured_image = wp_get_attachment_url( get_post_thumbnail_id($post->ID) );
-		$string = str_replace( "%post_feat_image", 	$featured_image, $string);
+		$string = str_replace( "%post_feat_image", 	$featured_image, $string); // deprecated
+		$string = str_replace( "%post_featured_image_url", 	$featured_image, $string);
+		$string = str_replace( "%post_featured_image", 	"<img src=\"" . $featured_image . "\" />", $string);
 
 		$string = str_replace( "%post_title", 	$post->post_title, 	$string);
 		$string = str_replace( "%post_excerpt", 	$post->post_excerpt, 	$string);
@@ -207,7 +211,8 @@ class CPCM_Manager {
 
 					// Transfer properties from the old menu item to the new one
 					$post->target = $menu_item->target;
-					//$post->classes = $menu_item->classes; // Don't copy the classes, because this will also copy the 'active' CSS class too all siblings of the selected menu item.
+					//$post->classes = $menu_item->classes; // Don't copy the classes, because this will also copy the 'active' CSS class too all siblings of the selected menu item. http://wordpress.org/support/topic/active-css-class
+					
 					$post->xfn = $menu_item->xfn;
 					$post->description = $menu_item->description;
 
@@ -219,10 +224,12 @@ class CPCM_Manager {
 
 					$inc += 1;
 				}
-				// Extend the items with classes.
-				_wp_menu_item_classes_by_context( $posts );
 				// Append the new menu_items to the menu array that we're building.
 				$result = array_merge( $result, $posts );
+				
+				// Apply _wp_menu_item_classes_by_context not only to the $posts array, but to the whole result array so that the classes for the original menu items are regenerated as well. Solves: http://wordpress.org/support/topic/issue-with-default-wordpress-sidebar-menu and http://wordpress.org/support/topic/menu-do-not-include-the-current-menu-parent-class
+				// Extend the items with classes.
+				_wp_menu_item_classes_by_context( $result );
 			} else {
 				// Treat other objects as usual, but note that the position 
 				// of elements in the array changes.
