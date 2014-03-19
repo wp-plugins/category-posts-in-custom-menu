@@ -142,7 +142,7 @@ class CPCM_Manager {
 		$string = str_replace( "%post_excerpt", 	$post->post_excerpt, 	$string);
 		$string = str_replace( "%post_url", 	get_permalink($post->ID), 	$string);
 
-		replace_dates($post, $string);
+		$string = replace_dates($post, $string);
 
 		$string = str_replace( "%post_comment_count", 	$post->comment_count, 	$string);
 		

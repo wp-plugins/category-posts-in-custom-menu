@@ -41,6 +41,7 @@
 		$string = preg_replace("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified')", $string);
 		$string = str_replace( "%post_modified", 	$post_modified, 	$string);
 		
+		return $string;
 	}
 
 

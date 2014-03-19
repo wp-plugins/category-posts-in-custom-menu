@@ -62,6 +62,7 @@
 		$string = preg_replace_callback("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
 		$string = str_replace( "%post_modified", 	$post_modified, 	$string);
 		
+		return $string;
 	}
 
 ?>
