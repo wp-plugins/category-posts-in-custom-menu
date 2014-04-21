@@ -18,27 +18,29 @@
 
 	function replace_dates($post, $string){
 		
+		$format_pattern = "([a-zA-Z\s\\\\:\/,]*)";
+		
 		// PHP 5.2 and downwards compatible, use preg_replace for all regular expressions
 		$post_date_gmt = $post->post_date_gmt;
 		$string = preg_replace("/\%post_date_gmt\(\)/", mysql2date('F jS, Y', $post_date_gmt), $string);
-		$string = preg_replace("/\%post_date_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date_gmt')", $string);
+		$string = preg_replace("/\%post_date_gmt\(" . $format_pattern . "\)/e", "mysql2date('$1', '$post_date_gmt')", $string);
 		$string = str_replace( "%post_date_gmt", 	$post_date_gmt, 	$string);
 
 		$post_date = $post->post_date;
 		$string = preg_replace("/\%post_date\(\)/", mysql2date('F jS, Y', $post_date), $string);
-		$string = preg_replace("/\%post_date\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_date')", $string);
+		$string = preg_replace("/\%post_date\(" . $format_pattern . "\)/e", "mysql2date('$1', '$post_date')", $string);
 		$string = str_replace( "%post_date", 	$post_date, 	$string);
 
 		$string = str_replace( "%post_status", 	$post->post_status, 	$string);
 
 		$post_modified_gmt = $post->post_modified_gmt;
 		$string = preg_replace("/\%post_modified_gmt\(\)/", mysql2date('F jS, Y', $post_modified_gmt), $string);
-		$string = preg_replace("/\%post_modified_gmt\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified_gmt')", $string);
+		$string = preg_replace("/\%post_modified_gmt\(" . $format_pattern . "\)/e", "mysql2date('$1', '$post_modified_gmt')", $string);
 		$string = str_replace( "%post_modified_gmt", 	$post_modified_gmt, 	$string);
 
 		$post_modified = $post->post_modified;
 		$string = preg_replace("/\%post_modified\(\)/", mysql2date('F jS, Y', $post_modified), $string);
-		$string = preg_replace("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/e", "mysql2date('$1', '$post_modified')", $string);
+		$string = preg_replace("/\%post_modified\(" . $format_pattern . "\)/e", "mysql2date('$1', '$post_modified')", $string);
 		$string = str_replace( "%post_modified", 	$post_modified, 	$string);
 		
 		return $string;

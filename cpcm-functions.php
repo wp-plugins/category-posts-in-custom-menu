@@ -18,6 +18,8 @@
 
 	function replace_dates($post, $string) {
 		
+		$format_pattern = "([a-zA-Z\s\\\\:\/,]*)";
+		
 		// PHP 5.3 and upwards compatible, use preg_replace_callback for regular expressions with /e parameter instead of preg_replace
 		// http://wordpress.org/support/topic/php-55-preg_replace-e-modifier-depricated?replies=1
 		$post_date_gmt = $post->post_date_gmt;
@@ -27,7 +29,7 @@
 			{
 				return mysql2date($matches[1], $post_date_gmt);
 			};	
-		$string = preg_replace_callback("/\%post_date_gmt\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
+		$string = preg_replace_callback("/\%post_date_gmt\(" . $format_pattern . "\)/", $callback, $string);
 		$string = str_replace( "%post_date_gmt", 	$post_date_gmt, 	$string);
 
 		$post_date = $post->post_date;
@@ -37,7 +39,7 @@
 			{
 				return mysql2date($matches[1], $post_date);
 			};
-		$string = preg_replace_callback("/\%post_date\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
+		$string = preg_replace_callback("/\%post_date\(" . $format_pattern . "\)/", $callback, $string);
 		$string = str_replace( "%post_date", 	$post_date, 	$string);
 
 		$string = str_replace( "%post_status", 	$post->post_status, 	$string);
@@ -49,7 +51,7 @@
 			{
 				return mysql2date($matches[1], $post_modified_gmt);
 			};
-		$string = preg_replace_callback("/\%post_modified_gmt\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
+		$string = preg_replace_callback("/\%post_modified_gmt\(" . $format_pattern . "\)/", $callback, $string);
 		$string = str_replace( "%post_modified_gmt", 	$post_modified_gmt, 	$string);
 
 		$post_modified = $post->post_modified;
@@ -59,7 +61,7 @@
 			{
 				return mysql2date($matches[1], $post_modified);
 			};
-		$string = preg_replace_callback("/\%post_modified\(([a-zA-Z\s\\\\:,]*)\)/", $callback, $string);
+		$string = preg_replace_callback("/\%post_modified\(" . $format_pattern . "\)/", $callback, $string);
 		$string = str_replace( "%post_modified", 	$post_modified, 	$string);
 		
 		return $string;
