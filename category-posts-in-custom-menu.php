@@ -166,6 +166,9 @@ class CPCM_Manager {
 		$result = array();    
 		$inc = 0;
 		foreach ( (array) $sorted_menu_items as $key => $menu_item ) {
+		
+			$menu_item->menu_order = $menu_item->menu_order + $inc;
+		
 			// Augment taxonomy object with a list of its posts: Append posts to $result
 			// Optional: Remove the taxonomy object/original menu item itself.
 			if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "cpcm-unfold", true) == '1')) {					
@@ -180,7 +183,7 @@ class CPCM_Manager {
 				$query_arr['order'] = get_post_meta($menu_item->db_id, "cpcm-order", true);
 				$query_arr['orderby'] = get_post_meta($menu_item->db_id, "cpcm-orderby", true);
 				$query_arr['numberposts'] = get_post_meta($menu_item->db_id, "cpcm-item-count", true); // default value of -1 returns all posts
-
+				
 				// Support for custom post types
 				$tag = get_taxonomy($menu_item->object);
 				$query_arr['post_type'] = $tag->object_type;
@@ -192,12 +195,12 @@ class CPCM_Manager {
 				$menu_item_parent = $menu_item->menu_item_parent;
 				switch ($remove_original_item) {
 					case "always":
-						$inc += -1;
+						$inc -= 1;
 						break;
 					case "only if empty":
 						if (empty($posts))
 						{
-							$inc += -1;
+							$inc -= 1;
 						}
 						else 
 						{
@@ -209,6 +212,11 @@ class CPCM_Manager {
 						array_push($result,$menu_item);
 						$menu_item_parent = $menu_item->db_id;
 						break;
+				}
+				
+				if (is_numeric($query_arr['numberposts']) && $query_arr['numberposts'] == '0')
+				{
+					continue;
 				}
 
 				foreach( (array) $posts as $pkey => $post ) {
@@ -230,6 +238,8 @@ class CPCM_Manager {
 					$post->title = $this->replace_placeholders($post, $post->title);
 
 					$inc += 1;
+					
+					$post->menu_order = $menu_item->menu_order + $inc;
 				}
 				// Append the new menu_items to the menu array that we're building.
 				$result = array_merge( $result, $posts );
@@ -240,7 +250,7 @@ class CPCM_Manager {
 			} else {
 				// Treat other objects as usual, but note that the position 
 				// of elements in the array changes.
-				$result[$menu_item->menu_order + $inc] = $menu_item;
+				array_push($result,$menu_item);
 			}
 		}
 
@@ -248,6 +258,12 @@ class CPCM_Manager {
 		return $result;
 	} // function
 
+	function __empty($string){ 
+		$string = trim($string); 
+		if(!is_numeric($string)) return empty($string); 
+		return FALSE; 
+	}
+ 
 	/*
 	* Store the entered data in nav-menus.php by inspecting the $_POST variable again.
 	*/
@@ -257,7 +273,7 @@ class CPCM_Manager {
 			update_post_meta( $menu_item_db_id, 'cpcm-unfold', (!empty( $_POST['menu-item-cpcm-unfold'][$menu_item_db_id]) ) );
 			update_post_meta( $menu_item_db_id, 'cpcm-orderby', (empty( $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) ? "none" : $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, 'cpcm-order', (empty( $_POST['menu-item-cpcm-order'][$menu_item_db_id]) ? "DESC" : $_POST['menu-item-cpcm-order'][$menu_item_db_id]) );
-			update_post_meta( $menu_item_db_id, 'cpcm-item-count', (int) (empty( $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) );
+			update_post_meta( $menu_item_db_id, 'cpcm-item-count', (int) ($this->__empty( $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, 'cpcm-item-titles', (empty( $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) ? "%post_title" : $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, 'cpcm-remove-original-item', (empty( $_POST['menu-item-cpcm-remove-original-item'][$menu_item_db_id]) ? "always" : $_POST['menu-item-cpcm-remove-original-item'][$menu_item_db_id]) );
 		} // if 
