@@ -2,8 +2,8 @@
 Contributors: anaid
 Tags: menu, category, post tag, tag, posts, dynamic, automatic, custom, taxonomy, custom taxonomy
 Requires at least: 3.2.1
-Tested up to: 3.8
-Stable tag: 0.9.4
+Tested up to: 3.9
+Stable tag: 0.9.5
 
 Dynamic menus: This plugin automatically replaces selected Category / Post Tag / Custom Taxonomy links in a Custom Menu by a list of their posts/pages.
 
@@ -11,7 +11,7 @@ Dynamic menus: This plugin automatically replaces selected Category / Post Tag /
 
 The custom menu only allows adding a link that leads to a list of posts and pages belonging to a taxonomy (category, tag or custom). I wanted to insert the posts and pages <b>themselves</b> into the menu, so I wrote this plug-in. If you want to list the posts and pages belonging to a certain taxonomy in the menu and if you want Wordpress to do this automatically for you, then I hope you will find this plugin useful.
 
-<strong>Now also works for custom post taxonomies and custom post types!</strong>
+<strong>Also works for custom post taxonomies and custom post types!</strong>
 
 = Using it =
 Enable the plugin and go to Appearance > Menus. Create your Custom Menu. Add a taxonomy (category/tag/custom) to the menu. Next, you can choose if you would like to replace the original link (to a page that lists the items) by the posts and pages themselves.
@@ -19,8 +19,8 @@ Enable the plugin and go to Appearance > Menus. Create your Custom Menu. Add a t
 For each Category or Post Tag item in the menu, you now have the following extra configuration options: 
 
 * replace the link by a list of posts in the menu y/n; 
-* specify the (maximum) number of posts you want to show for this item (-1 = all);
-* their ordering ascending or descending by ID, Author, Title and other properties. See 'Other Notes > Ordering'.
+* specify the (maximum) number of posts you want to show for this item (-1 = all, 0 also allowed now);
+* their ordering ascending or descending by ID, Author, Title and other properties. See 'Other Notes > Ordering';
 * keep or remove the original menu item (always / only if there are no posts / never);
 * specify the title for the menu items. For this you can use %post_title, %post_author and other wildcards, see 'Other Notes > Wildcards'.
 
@@ -80,6 +80,11 @@ You can control the ordering of the items in the menu by sorting ascending or de
 1. Go to Appearance > Menu to enable/disable and set the options for the replacement of Category / Post Tag links by their posts.
 
 == Changelog ==
+
+0.9.5
+
+* Fixed http://wordpress.org/support/topic/great-job-please-contact-me?replies=2. You can now specify 0 in 'Number of posts'. That way, the category can be shown/hidden based on whether it is empty or not.
+* Fixed http://wordpress.org/support/topic/post_date. Forward slash is now accepted in date formatting.
 
 0.9.4
 
