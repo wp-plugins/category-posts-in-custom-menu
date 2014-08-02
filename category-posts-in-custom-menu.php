@@ -165,6 +165,8 @@ class CPCM_Manager {
 	function cpcm_replace_taxonomy_by_posts( $sorted_menu_items, $args ) {
 		$result = array();    
 		$inc = 0;
+		
+		$removed_menu_items = array();
 		foreach ( (array) $sorted_menu_items as $key => $menu_item ) {
 		
 			$menu_item->menu_order = $menu_item->menu_order + $inc;
@@ -196,21 +198,21 @@ class CPCM_Manager {
 				switch ($remove_original_item) {
 					case "always":
 						$inc -= 1;
+						$removed_menu_items[$menu_item->ID] = $menu_item->menu_item_parent;
 						break;
 					case "only if empty":
 						if (empty($posts))
 						{
 							$inc -= 1;
+							$removed_menu_items[$menu_item->ID] = $menu_item->menu_item_parent;
 						}
 						else 
 						{
 							array_push($result,$menu_item);
-							$menu_item_parent = $menu_item->db_id;
 						}
 						break;
 					case "never":
 						array_push($result,$menu_item);
-						$menu_item_parent = $menu_item->db_id;
 						break;
 				}
 				
@@ -218,11 +220,26 @@ class CPCM_Manager {
 				{
 					continue;
 				}
+				
+				// Set the menu_item_parent for the menu_item: If the parent item was removed, go up a level
+				$current_parent_id = $menu_item->menu_item_parent;
+				while (array_key_exists(strval($current_parent_id), $removed_menu_items) == 1)
+				{
+					$current_parent_id = $removed_menu_items[$current_parent_id];
+				}
+				$menu_item->menu_item_parent = $current_parent_id;
 
 				foreach( (array) $posts as $pkey => $post ) {
 					// Decorate the posts with the required data for a menu-item.
 					$post = wp_setup_nav_menu_item( $post );
-					$post->menu_item_parent = $menu_item_parent; // Set to parent of taxonomy item.
+					
+					// Set the menu_item_parent for the post: If the parent item was removed, go up a level
+					$current_parent_id = $menu_item->db_id;
+					while (array_key_exists(strval($current_parent_id), $removed_menu_items) == 1)
+					{
+						$current_parent_id = $removed_menu_items[$current_parent_id];
+					}
+					$post->menu_item_parent = $current_parent_id;
 
 					// Transfer properties from the old menu item to the new one
 					$post->target = $menu_item->target;
