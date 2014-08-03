@@ -166,7 +166,7 @@ class CPCM_Manager {
 		$result = array();    
 		$inc = 0;
 		
-		$removed_menu_items = array();
+		$menu_item_parent_map = array(); // Holds, for each menu item I that was removed, a link to the item that should become the new parent P of menu items under I
 		foreach ( (array) $sorted_menu_items as $key => $menu_item ) {
 		
 			$menu_item->menu_order = $menu_item->menu_order + $inc;
@@ -197,14 +197,29 @@ class CPCM_Manager {
 				$menu_item_parent = $menu_item->menu_item_parent;
 				switch ($remove_original_item) {
 					case "always":
-						$inc -= 1;
-						$removed_menu_items[$menu_item->ID] = $menu_item->menu_item_parent;
+						if (empty($posts))
+						{
+							$inc -= 1;
+							$menu_item_parent_map[$menu_item->db_id] = $menu_item->menu_item_parent;
+						}
+						else if (count($posts) == 1)
+						{
+							// If the menu-item should be removed, but it has exactly one post, then use this post as new parent for any menu items down the line.
+							// Because we can't use posts as menu items (they don't have a db_id), reuse the menu_item object and transfer the post properties to the menu_item in the foreach loop
+							// See {note 1} in foreach
+							array_push($result,$menu_item);
+						}
+						else
+						{
+							$inc -= 1;
+							$menu_item_parent_map[$menu_item->db_id] = $menu_item->menu_item_parent;
+						}
 						break;
 					case "only if empty":
 						if (empty($posts))
 						{
 							$inc -= 1;
-							$removed_menu_items[$menu_item->ID] = $menu_item->menu_item_parent;
+							$menu_item_parent_map[$menu_item->db_id] = $menu_item->menu_item_parent;
 						}
 						else 
 						{
@@ -223,21 +238,36 @@ class CPCM_Manager {
 				
 				// Set the menu_item_parent for the menu_item: If the parent item was removed, go up a level
 				$current_parent_id = $menu_item->menu_item_parent;
-				while (array_key_exists(strval($current_parent_id), $removed_menu_items) == 1)
+				while (array_key_exists(strval($current_parent_id), $menu_item_parent_map) == 1)
 				{
-					$current_parent_id = $removed_menu_items[$current_parent_id];
+					$current_parent_id = $menu_item_parent_map[$current_parent_id];
 				}
 				$menu_item->menu_item_parent = $current_parent_id;
 
-				foreach( (array) $posts as $pkey => $post ) {
+				foreach( (array) $posts as $pkey => $post ) {				
+				
 					// Decorate the posts with the required data for a menu-item.
-					$post = wp_setup_nav_menu_item( $post );
+					if (count($posts) == 1 && $pkey == 0 && ($remove_original_item == "always" || $remove_original_item == "only if empty"))
+					{
+						// {note 1}
+						unset($posts[0]); // Do not use the post, but re-use the menu item instead.
+						$menu_item->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
+						$menu_item->title = $this->replace_placeholders($menu_item, $post->post_title);
+						$menu_item->url = get_permalink($post->ID);
+						
+						// menu_item_parent and menu_order are already correct for menu_item.
+						continue;
+					}
+					else
+					{
+						$post = wp_setup_nav_menu_item( $post );
+					}
 					
 					// Set the menu_item_parent for the post: If the parent item was removed, go up a level
 					$current_parent_id = $menu_item->db_id;
-					while (array_key_exists(strval($current_parent_id), $removed_menu_items) == 1)
+					while (array_key_exists(strval($current_parent_id), $menu_item_parent_map) == 1)
 					{
-						$current_parent_id = $removed_menu_items[$current_parent_id];
+						$current_parent_id = $menu_item_parent_map[$current_parent_id];
 					}
 					$post->menu_item_parent = $current_parent_id;
 
@@ -272,6 +302,8 @@ class CPCM_Manager {
 		}
 
 		unset( $sorted_menu_items );
+		unset( $menu_item_parent_map );
+		
 		return $result;
 	} // function
 
