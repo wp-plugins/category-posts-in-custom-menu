@@ -252,7 +252,7 @@ class CPCM_Manager {
 						// {note 1}
 						unset($posts[0]); // Do not use the post, but re-use the menu item instead.
 						$menu_item->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
-						$menu_item->title = $this->replace_placeholders($menu_item, $post->post_title);
+						$menu_item->title = $this->replace_placeholders($post, $menu_item->title);
 						$menu_item->url = get_permalink($post->ID);
 						
 						// menu_item_parent and menu_order are already correct for menu_item.
