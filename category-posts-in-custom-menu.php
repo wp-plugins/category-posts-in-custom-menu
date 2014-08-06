@@ -68,8 +68,10 @@ class CPCM_Manager {
 			delete_post_meta($nav_menu_item->ID, 'cpcm-orderby');
 			delete_post_meta($nav_menu_item->ID, 'cpcm-order');
 			delete_post_meta($nav_menu_item->ID, 'cpcm-item-count');
+			delete_post_meta($nav_menu_item->ID, 'cpcm-item-skip');
 			delete_post_meta($nav_menu_item->ID, 'cpcm-item-titles');
-			delete_post_meta($nave_menu_item->ID, 'cpcm-remove-original-item');
+			delete_post_meta($nav_menu_item->ID, 'cpcm-remove-original-item');
+			delete_post_meta($nav_menu_item->ID, 'cpcm-subcategories');
 		}
 	} // function
 
@@ -176,15 +178,40 @@ class CPCM_Manager {
 			if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "cpcm-unfold", true) == '1')) {					
 				$query_arr = array();
 
-				$query_arr['tax_query'] = array(array('taxonomy'=>$menu_item->object,
-				'field'=>'id',
-				'terms'=>$menu_item->object_id
-				));
-
+				// Example:  Array ( [0] => Array ( [taxonomy] => category [field] => id [terms] => 3 ) ), i.e. get a category by id, where id = 3
+				$query_arr['tax_query'] = array(
+					'relation' => 'AND',
+					array(
+						'taxonomy'=>$menu_item->object,
+						'field'=>'id',
+						'terms'=>$menu_item->object_id
+					)
+				);
+				
+				$subcategory_behavior = get_post_meta($menu_item->db_id, "cpcm-subcategories", true);
+				switch ($subcategory_behavior) {
+					case "exclude": 
+						// Subcategories should be excluded, so append a query to tax_query that does exactly that
+						$category_children = array_diff(explode('/',get_category_children($menu_item->object_id)),array(""));
+						
+						$query_arr['tax_query'][] = 
+							array(
+									'taxonomy'=>$menu_item->object,
+									'terms' => $category_children,      
+									'field' => 'id',
+									'operator' => 'NOT IN' 
+								);
+						break;
+					case "flatten": /* No additional filtering */
+					default: break;
+				}
+				
 				// If cpcm-unfold is true, the following custom fields exist:
 				$query_arr['order'] = get_post_meta($menu_item->db_id, "cpcm-order", true);
 				$query_arr['orderby'] = get_post_meta($menu_item->db_id, "cpcm-orderby", true);
 				$query_arr['numberposts'] = get_post_meta($menu_item->db_id, "cpcm-item-count", true); // default value of -1 returns all posts
+				$query_arr['offset'] = get_post_meta($menu_item->db_id, "cpcm-item-skip", true); // default value of 0 skips no posts
+				$query_arr['posts_per_page'] = $query_arr['numberposts'] != '-1' ? get_post_meta($menu_item->db_id, "cpcm-item-count", true) : 100000; // http://wordpress.stackexchange.com/a/13376 posts_per_page does not accept -1, but is a required argument to make offset work. So, whenever numberposts is positive, use that. Otherwise, use the proposed workaround on the SO topic.
 				
 				// Support for custom post types
 				$tag = get_taxonomy($menu_item->object);
@@ -323,8 +350,10 @@ class CPCM_Manager {
 			update_post_meta( $menu_item_db_id, 'cpcm-orderby', (empty( $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) ? "none" : $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, 'cpcm-order', (empty( $_POST['menu-item-cpcm-order'][$menu_item_db_id]) ? "DESC" : $_POST['menu-item-cpcm-order'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, 'cpcm-item-count', (int) ($this->__empty( $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) );
+			update_post_meta( $menu_item_db_id, 'cpcm-item-skip', (int) ($this->__empty( $_POST['menu-item-cpcm-item-skip'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-skip'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, 'cpcm-item-titles', (empty( $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) ? "%post_title" : $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, 'cpcm-remove-original-item', (empty( $_POST['menu-item-cpcm-remove-original-item'][$menu_item_db_id]) ? "always" : $_POST['menu-item-cpcm-remove-original-item'][$menu_item_db_id]) );
+			update_post_meta( $menu_item_db_id, 'cpcm-subcategories', (empty( $_POST['menu-item-cpcm-subcategories'][$menu_item_db_id]) ? "flatten" : $_POST['menu-item-cpcm-subcategories'][$menu_item_db_id]) );
 		} // if 
 	} // function
 
@@ -479,6 +508,12 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
                                 <input type="text" id="edit-menu-item-cpcm-item-count-<?php echo $item_id; ?>" class="widefat code edit-menu-item-cpcm-item-count" name="menu-item-cpcm-item-count[<?php echo $item_id; ?>]" value="<?php $item_count = get_post_meta($item_id, "cpcm-item-count", true); echo $item_count != '' ? $item_count : '-1'; ?>" />
                             </label>
                         </p>
+                        <p class="field-cpcm-item-skip description description-thin">
+                            <label for="edit-menu-item-cpcm-item-skip-<?php echo $item_id; ?>">
+                                <?php _e( 'Skip Posts' ); ?><br />
+                                <input type="text" id="edit-menu-item-cpcm-item-skip-<?php echo $item_id; ?>" class="widefat code edit-menu-item-cpcm-item-skip" name="menu-item-cpcm-item-skip[<?php echo $item_id; ?>]" value="<?php $item_skip = get_post_meta($item_id, "cpcm-item-skip", true); echo $item_skip != '' ? $item_skip : '0'; ?>" />
+                            </label>
+                        </p>
                         <p class="field-cpcm-orderby description description-thin">
                             <label for="edit-menu-item-cpcm-orderby-<?php echo $item_id; ?>">
                                 <?php _e( 'Order By' ); ?><br />
@@ -512,6 +547,15 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
                                     <option value="always" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "always" )  ?>><?php _e('Always'); ?></option>
                                     <option value="only if empty" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "only if empty" )  ?>><?php _e('Only if there are no posts'); ?></option>
                                     <option value="never" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "never" )  ?>><?php _e('Never'); ?></option>
+                                </select>
+                            </label>
+						</p>
+                        <p class="field-cpcm-subcategories description description-thin">
+                            <label for="edit-menu-item-cpcm-subcategories-<?php echo $item_id; ?>">
+                                <?php _e( 'Subcategory posts' ); ?><br />
+                                <select id="edit-menu-item-cpcm-subcategories-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-subcategories" name="menu-item-cpcm-subcategories[<?php echo $item_id; ?>]">
+                                    <option value="flatten" <?php selected( get_post_meta($item_id, "cpcm-subcategories", true), "flatten" )  ?>><?php _e('Include'); ?></option>
+                                    <option value="exclude" <?php selected( get_post_meta($item_id, "cpcm-subcategories", true), "exclude" )  ?>><?php _e('Exclude'); ?></option>
                                 </select>
                             </label>
 						</p>
