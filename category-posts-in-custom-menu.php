@@ -194,13 +194,16 @@ class CPCM_Manager {
 						// Subcategories should be excluded, so append a query to tax_query that does exactly that
 						$category_children = array_diff(explode('/',get_category_children($menu_item->object_id)),array(""));
 						
-						$query_arr['tax_query'][] = 
-							array(
-									'taxonomy'=>$menu_item->object,
-									'terms' => $category_children,      
-									'field' => 'id',
-									'operator' => 'NOT IN' 
-								);
+						if (!empty($category_children))
+						{												
+							$query_arr['tax_query'][] = 
+								array(
+										'taxonomy'=>$menu_item->object,
+										'terms' => $category_children,      
+										'field' => 'id',
+										'operator' => 'NOT IN' 
+									);
+						}
 						break;
 					case "flatten": /* No additional filtering */
 					default: break;
