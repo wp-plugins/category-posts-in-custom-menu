@@ -149,13 +149,13 @@ class CPCM_Manager {
 		$string = str_replace( "%post_comment_count", 	$post->comment_count, 	$string);
 		
 		// Remove remaining %post_ occurrences.
-		$pattern = "/" . "((\((?P<lbrack>(\S*))))?" . "\%post_\w+(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))" . "(((?P<rbrack>(\S*))\)))?" . "/";
+		$pattern = "/" . "((\((?P<lbrack>(\S*))))?" . "\%post_[-\w]*(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))" . "(((?P<rbrack>(\S*))\)))?" . "/";
 		$string = preg_replace($pattern, '', $string);
 		
-		$pattern = "/%post_\w+(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))?/";
+		$pattern = "/%post_[-\w]*(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))?/";
 		$string = preg_replace($pattern, '', $string);			
 		
-		$pattern = "/%post_\w+(\(\w*\))?/"; 
+		$pattern = "/%post_[-\w]*(\([-\w]*\))?/"; 
 		$string = preg_replace($pattern, '', $string);
 		
 		return $string;
