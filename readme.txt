@@ -2,8 +2,8 @@
 Contributors: anaid
 Tags: menu, category, post tag, tag, posts, dynamic, automatic, custom, taxonomy, custom taxonomy
 Requires at least: 3.2.1
-Tested up to: 3.9
-Stable tag: 0.9.5
+Tested up to: 4.1
+Stable tag: 1.0
 
 Dynamic menus: This plugin automatically replaces selected Category / Post Tag / Custom Taxonomy links in a Custom Menu by a list of their posts/pages.
 
@@ -80,6 +80,14 @@ You can control the ordering of the items in the menu by sorting ascending or de
 1. Go to Appearance > Menu to enable/disable and set the options for the replacement of Category / Post Tag links by their posts.
 
 == Changelog ==
+
+1.0
+
+* Bugfix: Correctly set the menu item parents. Relevant when nesting categories with 'Create submenu' checked.
+* First implementation (WIP) for request: http://wordpress.org/support/topic/replace-category-link-with-link-to-first-post?replies=10
+When the menu item is marked as remove "always" or "only if empty" and there was one post, then make sure that any childen of the menu item become children of this single post.
+* Implement skip-parameter
+* Implemented exclusion of subcategories, useful alternative to http://wordpress.org/support/topic/is-it-possible-to-get-sub-category-post-nested
 
 0.9.5
 
