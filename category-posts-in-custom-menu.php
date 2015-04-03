@@ -324,6 +324,15 @@ class CPCM_Manager {
 					$result = array_merge( $result, $posts );
 				}
 			} else {
+				// Other objects may have a parent that has been removed by cpcm. Fix that here.
+				// Set the menu_item_parent for the menu_item: If the parent item was removed, go up a level
+				$current_parent_id = $menu_item->menu_item_parent;
+				while (array_key_exists(strval($current_parent_id), $menu_item_parent_map) == 1)
+				{
+					$current_parent_id = $menu_item_parent_map[$current_parent_id];
+				}
+				$menu_item->menu_item_parent = $current_parent_id;
+				
 				// Treat other objects as usual, but note that the position 
 				// of elements in the array changes.
 				array_push($result,$menu_item);
