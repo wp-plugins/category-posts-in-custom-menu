@@ -276,23 +276,7 @@ class CPCM_Manager {
 				$menu_item->menu_item_parent = $current_parent_id;
 
 				foreach( (array) $posts as $pkey => $post ) {				
-				
-					// Decorate the posts with the required data for a menu-item.
-					if (count($posts) == 1 && $pkey == 0 && ($remove_original_item == "always" || $remove_original_item == "only if empty"))
-					{
-						// {note 1}
-						unset($posts[0]); // Do not use the post, but re-use the menu item instead.
-						$menu_item->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
-						$menu_item->title = $this->replace_placeholders($post, $menu_item->title);
-						$menu_item->url = get_permalink($post->ID);
-						
-						// menu_item_parent and menu_order are already correct for menu_item.
-						continue;
-					}
-					else
-					{
-						$post = wp_setup_nav_menu_item( $post );
-					}
+					$post = wp_setup_nav_menu_item( $post );
 					
 					// Set the menu_item_parent for the post: If the parent item was removed, go up a level
 					$current_parent_id = $menu_item->db_id;
@@ -319,12 +303,26 @@ class CPCM_Manager {
 					
 					$post->menu_order = $menu_item->menu_order + $inc;
 				}
-				// Append the new menu_items to the menu array that we're building.
-				$result = array_merge( $result, $posts );
 				
-				// Apply _wp_menu_item_classes_by_context not only to the $posts array, but to the whole result array so that the classes for the original menu items are regenerated as well. Solves: http://wordpress.org/support/topic/issue-with-default-wordpress-sidebar-menu and http://wordpress.org/support/topic/menu-do-not-include-the-current-menu-parent-class
+				// Solve https://wordpress.org/support/topic/works-with-41-as-far-as-i-can-tell?replies=5, regenerate all classes for the posts, and copy those classes to the menu_item that we're reusing.
 				// Extend the items with classes.
-				_wp_menu_item_classes_by_context( $result );
+				_wp_menu_item_classes_by_context( $posts );
+				
+				// Decorate the posts with the required data for a menu-item.
+				if (count($posts) == 1 && ($remove_original_item == "always" || $remove_original_item == "only if empty"))
+				{
+					// {note 1}
+					// Do not use the post, but re-use the menu item instead.
+					$menu_item->title = get_post_meta($menu_item->db_id, "cpcm-item-titles", true);
+					$menu_item->title = $this->replace_placeholders($post, $menu_item->title);
+					$menu_item->url = get_permalink($post->ID);
+					$menu_item->classes = $posts[0]->classes;
+				}
+				else
+				{
+					// Append the new menu_items to the menu array that we're building.
+					$result = array_merge( $result, $posts );
+				}
 			} else {
 				// Treat other objects as usual, but note that the position 
 				// of elements in the array changes.
@@ -334,6 +332,9 @@ class CPCM_Manager {
 
 		unset( $sorted_menu_items );
 		unset( $menu_item_parent_map );
+		
+		// Apply _wp_menu_item_classes_by_context not only to the $posts array, but to the whole result array so that the classes for the original menu items are regenerated as well. Solves: http://wordpress.org/support/topic/issue-with-default-wordpress-sidebar-menu and http://wordpress.org/support/topic/menu-do-not-include-the-current-menu-parent-class
+		_wp_menu_item_classes_by_context( $result );
 		
 		return $result;
 	} // function
