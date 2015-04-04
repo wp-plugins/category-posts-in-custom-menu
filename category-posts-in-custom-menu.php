@@ -309,7 +309,7 @@ class CPCM_Manager {
 				_wp_menu_item_classes_by_context( $posts );
 				
 				// Decorate the posts with the required data for a menu-item.
-				if (count($posts) == 1 && ($remove_original_item == "always" || $remove_original_item == "only if empty"))
+				if (count($posts) == 1 && $remove_original_item == "always")
 				{
 					// {note 1}
 					// Do not use the post, but re-use the menu item instead.
