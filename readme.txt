@@ -206,4 +206,5 @@ This problem should only occur if:
 <li>Your Wordpress version is 3.0 or before: Issue 14527 (http://core.trac.wordpress.org/ticket/14527) may be the cause. When adding a menu item but <i>before</i> saving it, you will indeed see none of the promised checkboxes. So be sure to <b>save your menu</b> after you add a Category/Tag to your menu. <i>Then</i> you'll see the added functionality. Please update your Wordpress version to at least 3.0.1.</li>
 <li>You're using an old version of Category Posts in Custom Menu (1.0.0 and before). Please update to the latest version of CPCM.</li>
 <li>You're using another plugin that has a higher priority than CPCM and does not use the wp_nav_menu_item_custom_fields hook to add its fields to Appearances > Menus. This other plugin overwrites all fields instead, which means CPCM's fields won't show. Verify by disabling all other plugins and check if the CPCM fields now show.</li>
+<li>Other theme or plugin conflicts. Please disable all themes and plugins except CPCM; verify that the CPCM fields show; enable other plugins and themes one by one to determine which plugin/theme conflicts with CPCM.<li>
 </ul>
