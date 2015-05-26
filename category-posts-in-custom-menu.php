@@ -289,6 +289,7 @@ class CPCM_Manager {
 					// Transfer properties from the old menu item to the new one
 					$post->target = $menu_item->target;
 					//$post->classes = $menu_item->classes; // Don't copy the classes, because this will also copy the 'active' CSS class too all siblings of the selected menu item. http://wordpress.org/support/topic/active-css-class
+					$post->classes = array_merge( $post->classes, (array) get_post_meta($menu_item->db_id, "_menu_item_classes", true) ); // copy custom css classes that the user specified under "CSS Classes (optional)"
 					
 					$post->xfn = $menu_item->xfn;
 					$post->description = $menu_item->description;
