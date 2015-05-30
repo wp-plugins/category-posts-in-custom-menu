@@ -51,7 +51,7 @@ class CPCM_Manager {
         add_filter( 'wp_nav_menu_objects', array( &$this, 'cpcm_replace_taxonomy_by_posts' ), 1, 2 );
         add_action( 'wp_update_nav_menu_item', array( &$this, 'cpcm_update_nav_menu_item' ), 1, 3 );  
 		
-		add_action('wp_nav_menu_item_custom_fields', array($this, 'cpcm_wp_nav_menu_item_custom_fields'),10,4  );
+		add_action('wp_nav_menu_item_custom_fields', array($this, 'cpcm_wp_nav_menu_item_custom_fields'), 10, 4 );
 	} // function
 
 	function CPCM_Manager()
@@ -192,8 +192,9 @@ class CPCM_Manager {
 				$subcategory_behavior = get_post_meta($menu_item->db_id, "cpcm-subcategories", true);
 				switch ($subcategory_behavior) {
 					case "exclude": 
-						// Subcategories should be excluded, so append a query to tax_query that does exactly that
-						$category_children = array_diff(explode('/',get_category_children($menu_item->object_id)),array(""));
+					
+						// Subcategories (subtaxonomies) should be excluded, so append a query to tax_query that does exactly that
+						$category_children = array_diff(get_term_children($menu_item->object_id, $menu_item->object),array(""));
 						
 						if (!empty($category_children))
 						{												
@@ -423,25 +424,40 @@ class CPCM_Manager {
 						</select>
 					</label>
 				</p>
-				<p class="field-cpcm-remove-original-item description description-thin">
-					<label for="edit-menu-item-cpcm-remove-original-item-<?php echo $item_id; ?>">
-						<?php _e( 'Remove original menu item' ); ?><br />
-						<select id="edit-menu-item-cpcm-remove-original-item-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-remove-original-item" name="menu-item-cpcm-remove-original-item[<?php echo $item_id; ?>]">
-							<option value="always" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "always" )  ?>><?php _e('Always'); ?></option>
-							<option value="only if empty" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "only if empty" )  ?>><?php _e('Only if there are no posts'); ?></option>
-							<option value="never" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "never" )  ?>><?php _e('Never'); ?></option>
-						</select>
-					</label>
-				</p>
-				<p class="field-cpcm-subcategories description description-thin">
-					<label for="edit-menu-item-cpcm-subcategories-<?php echo $item_id; ?>">
-						<?php _e( 'Subcategory posts' ); ?><br />
-						<select id="edit-menu-item-cpcm-subcategories-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-subcategories" name="menu-item-cpcm-subcategories[<?php echo $item_id; ?>]">
-							<option value="flatten" <?php selected( get_post_meta($item_id, "cpcm-subcategories", true), "flatten" )  ?>><?php _e('Include'); ?></option>
-							<option value="exclude" <?php selected( get_post_meta($item_id, "cpcm-subcategories", true), "exclude" )  ?>><?php _e('Exclude'); ?></option>
-						</select>
-					</label>
-				</p>
+				
+				<?php if (is_taxonomy_hierarchical($item->object)) { ?>
+					<p class="field-cpcm-remove-original-item description description-thin">
+				<?php } else { ?>
+					<p class="field-cpcm-remove-original-item description description-wide">
+				<?php } ?>
+						<label for="edit-menu-item-cpcm-remove-original-item-<?php echo $item_id; ?>">
+							<?php _e( 'Remove original menu item' ); ?><br />
+							<select id="edit-menu-item-cpcm-remove-original-item-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-remove-original-item" name="menu-item-cpcm-remove-original-item[<?php echo $item_id; ?>]">
+								<option value="always" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "always" )  ?>><?php _e('Always'); ?></option>
+								<option value="only if empty" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "only if empty" )  ?>><?php _e('Only if there are no posts'); ?></option>
+								<option value="never" <?php selected( get_post_meta($item_id, "cpcm-remove-original-item", true), "never" )  ?>><?php _e('Never'); ?></option>
+							</select>
+						</label>
+					</p>
+				<?php if (is_taxonomy_hierarchical($item->object)) { ?>
+					<p class="field-cpcm-subcategories description description-thin">
+						<label for="edit-menu-item-cpcm-subcategories-<?php echo $item_id; ?>">					
+							<?php 
+								if ('category' == $item->object) 
+								{
+									_e( 'Subcategory posts' ); 
+								}
+								else 
+								{
+									_e( 'Subtaxonomy posts' );	
+								} ?><br />					
+							<select id="edit-menu-item-cpcm-subcategories-<?php echo $item_id; ?>" class="widefat edit-menu-item-cpcm-subcategories" name="menu-item-cpcm-subcategories[<?php echo $item_id; ?>]">
+								<option value="flatten" <?php selected( get_post_meta($item_id, "cpcm-subcategories", true), "flatten" )  ?>><?php _e('Include'); ?></option>
+								<option value="exclude" <?php selected( get_post_meta($item_id, "cpcm-subcategories", true), "exclude" )  ?>><?php _e('Exclude'); ?></option>
+							</select>
+						</label>
+					</p>
+				<?php } ?>
 				<p class="field-cpcm-item-titles description description-wide">
 					<label for="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>">
 						<?php _e( 'Post Navigation Label' ); ?><br />
