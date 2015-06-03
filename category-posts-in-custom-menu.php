@@ -327,7 +327,13 @@ class CPCM_Manager
 				// Support for custom post types
 				$tag = get_taxonomy($menu_item->object);
 				$query_arr['post_type'] = $tag->object_type;
-
+				
+				// Allow plugin extensions that further modify the query
+				if (has_filter('cpcm_filter_posts_query'))
+				{
+					$query_arr = apply_filters( 'cpcm_filter_posts_query', $query_arr, $menu_item );					
+				}
+				 
 				$posts = get_posts( $query_arr );
 				
 				// Decide whether the original item needs to be preserved.
@@ -573,6 +579,11 @@ class CPCM_Manager
 						</label>
 					</p>
 				<?php } ?>
+								
+				<?php
+					do_action('cpcm_custom_fields', $item_id, $item );
+				?>
+				
 				<p class="field-cpcm-item-titles description description-wide">
 					<label for="edit-menu-item-cpcm-item-titles-<?php echo $item_id; ?>">
 						<?php _e( 'Post Navigation Label' ); ?><br />
