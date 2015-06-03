@@ -40,7 +40,8 @@ else
 
 new CPCM_Manager;
 
-class CPCM_Manager {
+class CPCM_Manager 
+{
 
 	// Added plugin options (source: http://wordpress.stackexchange.com/a/49797 with many thanks to stackexchange user onetrickpony)
     const OPTION_NAME = 'cpcm_options';
@@ -111,7 +112,8 @@ class CPCM_Manager {
 			*/
 			$all_nav_menu_items = get_posts('numberposts=-1&post_type=nav_menu_item');
 			
-			foreach( $all_nav_menu_items as $nav_menu_item) {
+			foreach( $all_nav_menu_items as $nav_menu_item) 
+			{
 				$meta = get_post_meta($nav_menu_item->db_id);
 				
 				if($meta !== '')
@@ -145,19 +147,21 @@ class CPCM_Manager {
 		return $this->options;
 	}
 	
-	static function startsWith($haystack, $needle) {
+	static function startsWith($haystack, $needle) 
+	{
 		// search backwards starting from haystack length characters from the end
 		return $needle === "" || strrpos($haystack, $needle, -strlen($haystack)) !== FALSE;
 	}
 	
-	static function endsWith($haystack, $needle) {
+	static function endsWith($haystack, $needle) 
+	{
 		// search forward starting from end minus needle length characters
 		return $needle === "" || (($temp = strlen($haystack) - strlen($needle)) >= 0 && strpos($haystack, $needle, $temp) !== FALSE);
 	}
 	
-	static function cpmp_uninstall() {
-		// We're uninstalling, so delete all custom fields on nav_menu_items that the CPCM plugin added
-	
+	static function cpmp_uninstall() 
+	{
+		// We're uninstalling, so delete all custom fields on nav_menu_items that the CPCM plugin added	
 		delete_post_meta_by_key($nav_menu_item->db_id, '_cpcm-unfold');
 		delete_post_meta_by_key($nav_menu_item->db_id, '_cpcm-orderby');
 		delete_post_meta_by_key($nav_menu_item->db_id, '_cpcm-order');
@@ -171,7 +175,8 @@ class CPCM_Manager {
 	/* 
 	* Add CSS for div.cpmp-description to nav-menus.php
 	*/
-	function cpmp_wp_admin_nav_menus_css($hook){
+	function cpmp_wp_admin_nav_menus_css($hook)
+	{
 		// Check the hook so that the .css is only added to the .php file where we need it
 		if( 'nav-menus.php' != $hook )
 				return;
@@ -188,8 +193,10 @@ class CPCM_Manager {
 	* If hooks are provided in later versions of wordpress, the plugin needs to be updated to use these hooks, that would be 
 	* much better.
 	*/
-	function cpcm_edit_nav_menu_walker( $walker_name, $menu_id ) {
-		if ( class_exists ( 'CPCM_Walker_Nav_Menu_Edit' ) ) {
+	function cpcm_edit_nav_menu_walker( $walker_name, $menu_id ) 
+	{
+		if ( class_exists ( 'CPCM_Walker_Nav_Menu_Edit' ) ) 
+		{
 				return 'CPCM_Walker_Nav_Menu_Edit';
 		}
 		return 'Walker_Nav_Menu_Edit';
@@ -198,7 +205,8 @@ class CPCM_Manager {
 	function replace_placeholders( $post, $string )
 	{
 		$custom_field_keys = get_post_custom_keys($post->ID);
-		foreach ( (array)$custom_field_keys as $key => $value ) {
+		foreach ( (array)$custom_field_keys as $key => $value ) 
+		{
 			$valuet = trim($value);
 			if ( '_' == $valuet{0} )
 			continue;
@@ -257,21 +265,23 @@ class CPCM_Manager {
 	/* 
 	* Build the menu structure for display: Augment taxonomies (category, tags or custom taxonomies) that have been marked as such, by their posts. Optionally: remove original menu item.
 	*/
-	function cpcm_replace_taxonomy_by_posts( $sorted_menu_items, $args ) {
+	function cpcm_replace_taxonomy_by_posts( $sorted_menu_items, $args ) 
+	{
 		
-		$this->getOptions(); // Triggers upgrades
+		$this->getOptions();
 		
 		$result = array();    
 		$inc = 0;
 		
 		$menu_item_parent_map = array(); // Holds, for each menu item I that was removed, a link to the item that should become the new parent P of menu items under I
-		foreach ( (array) $sorted_menu_items as $key => $menu_item ) {
-		
+		foreach ( (array) $sorted_menu_items as $key => $menu_item ) 
+		{		
 			$menu_item->menu_order = $menu_item->menu_order + $inc;
 		
 			// Augment taxonomy object with a list of its posts: Append posts to $result
 			// Optional: Remove the taxonomy object/original menu item itself.
-			if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "_cpcm-unfold", true) == '1')) {					
+			if ( $menu_item->type == 'taxonomy' && (get_post_meta($menu_item->db_id, "_cpcm-unfold", true) == '1')) 
+			{					
 				$query_arr = array();
 
 				// Example:  Array ( [0] => Array ( [taxonomy] => category [field] => id [terms] => 3 ) ), i.e. get a category by id, where id = 3
@@ -285,7 +295,8 @@ class CPCM_Manager {
 				);
 				
 				$subcategory_behavior = get_post_meta($menu_item->db_id, "_cpcm-subcategories", true);
-				switch ($subcategory_behavior) {
+				switch ($subcategory_behavior) 
+				{
 					case "exclude": 
 					
 						// Subcategories (subtaxonomies) should be excluded, so append a query to tax_query that does exactly that
@@ -322,7 +333,8 @@ class CPCM_Manager {
 				// Decide whether the original item needs to be preserved.
 				$remove_original_item = get_post_meta($menu_item->db_id, "_cpcm-remove-original-item", true);
 				$menu_item_parent = $menu_item->menu_item_parent;
-				switch ($remove_original_item) {
+				switch ($remove_original_item) 
+				{
 					case "always":
 						if (empty($posts))
 						{
@@ -371,7 +383,8 @@ class CPCM_Manager {
 				}
 				$menu_item->menu_item_parent = $current_parent_id;
 
-				foreach( (array) $posts as $pkey => $post ) {				
+				foreach( (array) $posts as $pkey => $post ) 
+				{
 					$post = wp_setup_nav_menu_item( $post );
 					
 					// Set the menu_item_parent for the post: If the parent item was removed, go up a level
@@ -420,7 +433,9 @@ class CPCM_Manager {
 					// Append the new menu_items to the menu array that we're building.
 					$result = array_merge( $result, $posts );
 				}
-			} else {
+			}
+			else 
+			{
 				// Other objects may have a parent that has been removed by cpcm. Fix that here.
 				// Set the menu_item_parent for the menu_item: If the parent item was removed, go up a level
 				$current_parent_id = $menu_item->menu_item_parent;
@@ -445,7 +460,8 @@ class CPCM_Manager {
 		return $result;
 	} // function
 
-	function __empty($string){ 
+	function __empty($string)
+	{ 
 		$string = trim($string); 
 		if(!is_numeric($string)) return empty($string); 
 		return FALSE; 
@@ -454,9 +470,11 @@ class CPCM_Manager {
 	/*
 	* Store the entered data in nav-menus.php by inspecting the $_POST variable again.
 	*/
-	function cpcm_update_nav_menu_item( $menu_id = 0, $menu_item_db_id = 0, $menu_item_data = array() ) {
+	function cpcm_update_nav_menu_item( $menu_id = 0, $menu_item_db_id = 0, $menu_item_data = array() ) 
+	{
 		// Only inspect the values if the $_POST variable contains data (the wp_update_nav_menu_item filter is applied in three other places, without a $_POST action)
-		if ( ! empty( $_POST['menu-item-db-id'] ) ) {
+		if ( ! empty( $_POST['menu-item-db-id'] ) ) 
+		{
 			update_post_meta( $menu_item_db_id, '_cpcm-unfold', (!empty( $_POST['menu-item-cpcm-unfold'][$menu_item_db_id]) ) );
 			update_post_meta( $menu_item_db_id, '_cpcm-orderby', (empty( $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) ? "none" : $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, '_cpcm-order', (empty( $_POST['menu-item-cpcm-order'][$menu_item_db_id]) ? "DESC" : $_POST['menu-item-cpcm-order'][$menu_item_db_id]) );
@@ -469,10 +487,10 @@ class CPCM_Manager {
 	} // function
 
 	
-	function cpcm_wp_nav_menu_item_custom_fields( $item_id, $item, $depth, $args) {
+	function cpcm_wp_nav_menu_item_custom_fields( $item_id, $item, $depth, $args) 
+	{
 		
-		$this->getOptions();  // Triggers upgrades
-
+		$this->getOptions();
 		$item_id = esc_attr( $item->ID );
 		 
 		/* BEGIN CATEGORY POSTS IN CUSTOM MENU */ 
@@ -568,8 +586,10 @@ class CPCM_Manager {
 	}
 } // class
 
-class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
-	function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0) {
+class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  
+{
+	function start_el(&$output, $item, $depth = 0, $args = array(), $id = 0) 
+	{
 
 		$item_output = '';
 		parent::start_el( $item_output, $item, $depth, $args, $id );
@@ -580,7 +600,8 @@ class CPCM_Walker_Nav_Menu_Edit extends Walker_Nav_Menu_Edit  {
 		 $output .= str_replace( $position, $extra . $position, $item_output );
 	} // function
 	
-	function get_fields( $item, $depth, $args = array(), $id = 0 ) {
+	function get_fields( $item, $depth, $args = array(), $id = 0 ) 
+	{
 		ob_start();
 
 		// conform to https://core.trac.wordpress.org/attachment/ticket/14414/nav_menu_custom_fields.patch
