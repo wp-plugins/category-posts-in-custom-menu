@@ -203,25 +203,7 @@ class CPCM_Manager
 	} // function
 
 	function replace_placeholders( $post, $string )
-	{
-		$custom_field_keys = get_post_custom_keys($post->ID);
-		foreach ( (array)$custom_field_keys as $key => $value ) 
-		{
-			$valuet = trim($value);
-			if ( '_' == $valuet{0} )
-			continue;
-			$meta = get_post_meta($post->ID, $valuet, true);
-			$valuet_str = str_replace(' ', '_', $valuet);
-			// Check if post_myfield occurs
-			if (substr_count($string, "%post_" . $valuet_str) > 0)
-			{
-				if (is_string($meta))
-				{
-					$string = str_replace( "%post_" . $valuet_str, $meta, $string);
-				}
-			}
-		}
-		
+	{		
 		$userdata = get_userdata($post->post_author);
 		$string = str_replace( "%post_author", 	$userdata ? $userdata->data->display_name : '', $string);
 
@@ -248,6 +230,26 @@ class CPCM_Manager
 		$string = replace_dates($post, $string);
 
 		$string = str_replace( "%post_comment_count", 	$post->comment_count, 	$string);
+		
+		// Process custom fields last, so that users cannot override the built-in options like %post_featured_image with a custom field named "featured_image"	
+		// As reported here https://wordpress.org/support/topic/category-lastes-post-with-images?replies=7#post-7052239
+		$custom_field_keys = get_post_custom_keys($post->ID);
+		foreach ( (array)$custom_field_keys as $key => $value ) 
+		{
+			$valuet = trim($value);
+			if ( '_' == $valuet{0} )
+			continue;
+			$meta = get_post_meta($post->ID, $valuet, true);
+			$valuet_str = str_replace(' ', '_', $valuet);
+			// Check if post_myfield occurs
+			if (substr_count($string, "%post_" . $valuet_str) > 0)
+			{
+				if (is_string($meta))
+				{
+					$string = str_replace( "%post_" . $valuet_str, $meta, $string);
+				}
+			}
+		}
 		
 		// Remove remaining %post_ occurrences.
 		$pattern = "/" . "((\((?P<lbrack>(\S*))))?" . "\%post_[-\w]*(?P<brackets>(\(((?P<inner>[^\(\)]*)|(?P>brackets))\)))" . "(((?P<rbrack>(\S*))\)))?" . "/";
@@ -591,7 +593,9 @@ class CPCM_Manager
 						<span class="description"><?php _e('The navigation label for generated post links may be customized using wildcars such as: %post_title, %post_author, %post_my_field (for custom field \'my field\' or \'my_field\'). See documentation.'); ?></span>
 					</label>
 				</p>
-			</div>
+				
+			</div>		
+			
 		<?php endif; 
 		/* CATEGORY POSTS IN CUSTOM MENU END */		
 	}
