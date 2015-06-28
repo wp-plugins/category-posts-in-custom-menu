@@ -2,8 +2,8 @@
 Contributors: anaid
 Tags: menu, category, post tag, tag, posts, dynamic, automatic, custom, taxonomy, custom taxonomy
 Requires at least: 3.2.1
-Tested up to: 4.1
-Stable tag: 1.0.1
+Tested up to: 4.2.2
+Stable tag: 1.1
 
 Dynamic menus: This plugin automatically replaces selected Category / Post Tag / Custom Taxonomy links in a Custom Menu by a list of their posts/pages.
 
@@ -82,6 +82,16 @@ You can control the ordering of the items in the menu by sorting ascending or de
 1. Go to Appearance > Menu to enable/disable and set the options for the replacement of Category / Post Tag links by their posts.
 
 == Changelog ==
+
+1.1
+* Process custom fields last, so that users cannot override the built-in options like %post_featured_image with a custom field named "featured_image". As reported here https://wordpress.org/support/topic/category-lastes-post-with-images?replies=7#post-7052239
+* Allow others to extend my CPCM plugin with their own fields. Also includes a sample that shows how to do this. https://wordpress.org/support/topic/exclude-single-posts?replies=5
+* Some comments and code formatting
+* Introduced plugin versioning in code in order to perform data conversion 
+* Converted "cpcm-" custom fields to "_cpcm-" so that they don't show on post edit pages and the like.
+* Update contact information
+* Ensure that excluding subcategories now also works for custom taxonomies. Only show the dropdown for hierarchical taxonomies. (Tags no longer show 'Subcategory posts' dropdown.)
+* Add custom CSS classes, as suggested here https://wordpress.org/support/topic/adding-css-classes-to-the-newly-displayed-menu-items
 
 1.0.1
 
