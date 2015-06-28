@@ -84,6 +84,7 @@ You can control the ordering of the items in the menu by sorting ascending or de
 == Changelog ==
 
 1.1
+
 * Process custom fields last, so that users cannot override the built-in options like %post_featured_image with a custom field named "featured_image". As reported here https://wordpress.org/support/topic/category-lastes-post-with-images?replies=7#post-7052239
 * Allow others to extend my CPCM plugin with their own fields. Also includes a sample that shows how to do this. https://wordpress.org/support/topic/exclude-single-posts?replies=5
 * Some comments and code formatting
