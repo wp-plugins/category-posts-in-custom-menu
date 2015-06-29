@@ -59,7 +59,7 @@ function sample_update_nav_menu_item($menu_id = 0, $menu_item_db_id = 0, $menu_i
 {
 	// Only inspect the values if the $_POST variable contains data (the wp_update_nav_menu_item filter is applied in three other places, without a $_POST action)
 	if ( ! empty( $_POST['menu-item-db-id'] ) ) {
-		update_post_meta( $menu_item_db_id, '_excludeposts', ($_POST['menu-item-excludeposts'][$menu_item_db_id]) );
+		update_post_meta( $menu_item_db_id, '_excludeposts', ( !isset($_POST['menu-item-excludeposts'][$menu_item_db_id]) ? '' : $_POST['menu-item-excludeposts'][$menu_item_db_id] ) );
 	}
 }
 
