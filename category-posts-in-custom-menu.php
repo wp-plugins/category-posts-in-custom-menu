@@ -45,7 +45,7 @@ class CPCM_Manager
 
 	// Added plugin options (source: http://wordpress.stackexchange.com/a/49797 with many thanks to stackexchange user onetrickpony)
     const OPTION_NAME = 'cpcm_options';
-	const VERSION = '1.1';
+	const VERSION = '1.2.0';
 	
 	protected $options  = null;
 	protected $defaults = array('version'     => self::VERSION);
@@ -63,12 +63,79 @@ class CPCM_Manager
 
 	function CPCM_Manager()
 	{
+		$this->getOptions();
 		$this->__construct();
 
 	} // function
 	
-	public function getOptions()
-	{				
+	// Update from no versioning or version 1.1 to 1.2.0
+	private function Update120()
+	{
+		/*
+		* Upgrade to 1.2.0
+		* Update all custom fields: They should have a starting underscore
+		*/
+		$args = array('post_type' => 'nav_menu_item');
+		$all_nav_menu_items = get_posts($args);
+		
+		foreach( $all_nav_menu_items as $nav_menu_item) 
+		{
+			$cpcm_unfold = get_post_meta($nav_menu_item->ID, "cpcm-unfold", true);
+			if ($cpcm_unfold !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-unfold", $cpcm_unfold );
+			}
+			$cpcm_orderby = get_post_meta($nav_menu_item->ID, "cpcm-orderby", true);
+			if ($cpcm_orderby !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-orderby", $cpcm_orderby );
+			}
+			$cpcm_order = get_post_meta($nav_menu_item->ID, "cpcm-order", true);
+			if ($cpcm_order !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-order", $cpcm_order );
+			}
+			$cpcm_item_count = get_post_meta($nav_menu_item->ID, "cpcm-item-count", true);
+			if ($cpcm_item_count !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-item-count", $cpcm_item_count );
+			}
+			$cpcm_item_skip = get_post_meta($nav_menu_item->ID, "cpcm-item-skip", true);
+			if ($cpcm_item_skip !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-item-skip", $cpcm_item_skip );
+			}
+			$cpcm_item_titles = get_post_meta($nav_menu_item->ID, "cpcm-item-titles", true);
+			if ($cpcm_item_titles !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-item-titles", $cpcm_item_titles );
+			}
+			$cpcm_remove_original_item = get_post_meta($nav_menu_item->ID, "cpcm-remove-original-item", true);
+			if ($cpcm_remove_original_item !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-remove-original-item", $cpcm_remove_original_item );
+			}
+			$cpcm_subcategories = get_post_meta($nav_menu_item->ID, "cpcm-subcategories", true);
+			if ($cpcm_subcategories !== '')
+			{
+				update_post_meta( $nav_menu_item->ID, "_cpcm-subcategories", $cpcm_subcategories );
+			}
+		}
+		
+		// Delete old custom fields
+		delete_post_meta_by_key("cpcm-unfold");
+		delete_post_meta_by_key("cpcm-orderby");
+		delete_post_meta_by_key("cpcm-order");
+		delete_post_meta_by_key("cpcm-item-count");
+		delete_post_meta_by_key("cpcm-item-skip");
+		delete_post_meta_by_key("cpcm-item-titles");
+		delete_post_meta_by_key("cpcm-remove-original-item");
+		delete_post_meta_by_key("cpcm-subcategories");
+		/* End upgrade to 1.2.0 */
+	}
+	
+	private function getOptions()
+	{			
 		// already did the checks
 		if(isset($this->options))
 		{
@@ -81,12 +148,20 @@ class CPCM_Manager
 		// options exist
 		if($options !== false)
 		{
-			$new_version = version_compare($options['version'], self::VERSION, '!=');
+			$version_11 = version_compare($options['version'], "1.1", "==");
+			$new_version = version_compare($options['version'], self::VERSION, '<');
 			$desync = array_diff_key($this->defaults, $options) !== array_diff_key($options, $this->defaults);
 
 			// update options if version changed, or we have missing/extra (out of sync) option entries 
 			if($new_version || $desync)
 			{
+				// I made a mistake in version 1.1, resulting in a version number but no upgrade performed.
+				// If user comes from version 1.1, perform upgrade after all.
+				if ($version_11)
+				{
+					$this->Update120();
+				}
+				
 				$new_options = array();
 
 				// check for new options and set defaults if necessary
@@ -105,40 +180,8 @@ class CPCM_Manager
 			}
 		}
 		else // either new install or version from before versioning existed 
-		{
-			/*
-			* Upgrade to 1.1
-			* Update all custom fields: They should have a starting underscore
-			*/
-			$all_nav_menu_items = get_posts('numberposts=-1&post_type=nav_menu_item');
-			
-			foreach( $all_nav_menu_items as $nav_menu_item) 
-			{
-				$meta = get_post_meta($nav_menu_item->db_id);
-				
-				if($meta !== '')
-				{
-					// Iterate over all keys with prefix "cpcm-" and replace this prefix by "_cpcm-"
-					foreach((array)$meta as $key => $value)
-					{
-						if (CPCM_Manager::startsWith($key, 'cpcm-'))
-						{
-							update_post_meta($nav_menu_item->db_id, '_' . $key, $value );
-						}
-					}					
-				}
-			}
-			
-			// Delete old custom fields
-			delete_post_meta_by_key("cpcm-unfold");
-			delete_post_meta_by_key("cpcm-orderby");
-			delete_post_meta_by_key("cpcm-order");
-			delete_post_meta_by_key("cpcm-item-count");
-			delete_post_meta_by_key("cpcm-item-skip");
-			delete_post_meta_by_key("cpcm-item-titles");
-			delete_post_meta_by_key("cpcm-remove-original-item");
-			delete_post_meta_by_key("cpcm-subcategories");
-			/* End upgrade to 1.1 */
+		{			
+			$this->Update120(); // update to first version with (proper) versioning
 			
 			update_option(self::OPTION_NAME, $this->defaults);
 			$this->options = $this->defaults; 
@@ -268,8 +311,7 @@ class CPCM_Manager
 	* Build the menu structure for display: Augment taxonomies (category, tags or custom taxonomies) that have been marked as such, by their posts. Optionally: remove original menu item.
 	*/
 	function cpcm_replace_taxonomy_by_posts( $sorted_menu_items, $args ) 
-	{
-		
+	{		
 		$this->getOptions();
 		
 		$result = array();    
@@ -486,8 +528,8 @@ class CPCM_Manager
 			update_post_meta( $menu_item_db_id, '_cpcm-unfold', (!empty( $_POST['menu-item-cpcm-unfold'][$menu_item_db_id]) ) );
 			update_post_meta( $menu_item_db_id, '_cpcm-orderby', (empty( $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) ? "none" : $_POST['menu-item-cpcm-orderby'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, '_cpcm-order', (empty( $_POST['menu-item-cpcm-order'][$menu_item_db_id]) ? "DESC" : $_POST['menu-item-cpcm-order'][$menu_item_db_id]) );
-			update_post_meta( $menu_item_db_id, '_cpcm-item-count', (int) (!isset($_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) || $this->__empty( $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) );
-			update_post_meta( $menu_item_db_id, '_cpcm-item-skip', (int) (!isset($_POST['menu-item-cpcm-item-skip'][$menu_item_db_id]) || $this->__empty( $_POST['menu-item-cpcm-item-skip'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-skip'][$menu_item_db_id]) );
+			update_post_meta( $menu_item_db_id, '_cpcm-item-count', (int) ($this->__empty( $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-count'][$menu_item_db_id]) );
+			update_post_meta( $menu_item_db_id, '_cpcm-item-skip', (int) ($this->__empty( $_POST['menu-item-cpcm-item-skip'][$menu_item_db_id]) ? "-1" : $_POST['menu-item-cpcm-item-skip'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, '_cpcm-item-titles', (empty( $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) ? "%post_title" : $_POST['menu-item-cpcm-item-titles'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, '_cpcm-remove-original-item', (empty( $_POST['menu-item-cpcm-remove-original-item'][$menu_item_db_id]) ? "always" : $_POST['menu-item-cpcm-remove-original-item'][$menu_item_db_id]) );
 			update_post_meta( $menu_item_db_id, '_cpcm-subcategories', (empty( $_POST['menu-item-cpcm-subcategories'][$menu_item_db_id]) ? "flatten" : $_POST['menu-item-cpcm-subcategories'][$menu_item_db_id]) );
@@ -496,8 +538,7 @@ class CPCM_Manager
 
 	
 	function cpcm_wp_nav_menu_item_custom_fields( $item_id, $item, $depth, $args) 
-	{
-		
+	{		
 		$this->getOptions();
 		$item_id = esc_attr( $item->ID );
 		 
