@@ -83,6 +83,11 @@ You can control the ordering of the items in the menu by sorting ascending or de
 
 == Changelog ==
 
+1.2
+
+* Fixed serious bug in versioning, which resulted in version 1.1 having no settings at all anymore. This fix has been tested with both both the upgrade path 1.0.1 -> 1.2 and upgrade path 1.0.1 -> 1.1 -> 1.2, both upgrade paths should be fined now. My sincere apologies to all who experienced this issue.
+* Fixed debug errors as reported here https://wordpress.org/support/topic/undefined-index-56?replies=7
+
 1.1
 
 * Process custom fields last, so that users cannot override the built-in options like %post_featured_image with a custom field named "featured_image". As reported here https://wordpress.org/support/topic/category-lastes-post-with-images?replies=7#post-7052239
