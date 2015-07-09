@@ -86,6 +86,7 @@ You can control the ordering of the items in the menu by sorting ascending or de
 1.2
 
 * Fixed serious bug in versioning, which resulted in version 1.1 having no settings at all anymore. This fix has been tested with both both the upgrade path 1.0.1 -> 1.2 and upgrade path 1.0.1 -> 1.1 -> 1.2, both upgrade paths should be fined now. My sincere apologies to all who experienced this issue.
+* Fixed debug errors as reported here https://wordpress.org/support/topic/undefined-index-56?replies=7
 
 1.1
 
